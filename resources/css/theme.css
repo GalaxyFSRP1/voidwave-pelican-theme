@@ -1194,3 +1194,166 @@ pre,
     .fi-page,
     #voidwave-preferences { animation: none !important; }
 }
+
+/* Voidwave 1.3 — display profiles, ambience levels, and support utilities */
+:root[data-voidwave-palette='nebula'] {
+    --vw-purple: #d946ef;
+    --vw-violet: #8b5cf6;
+    --vw-cyan: #60a5fa;
+    --vw-pink: #fb7185;
+    --vw-border-bright: rgb(217 70 239 / .44);
+}
+
+:root[data-voidwave-palette='nebula'] body {
+    background:
+        radial-gradient(circle at 50% -20%, rgb(217 70 239 / .17), transparent 42rem),
+        linear-gradient(145deg, var(--vw-void), #12091b 48%, #090612) !important;
+}
+
+:root[data-voidwave-palette='nebula'] .voidwave-grid {
+    background-image:
+        linear-gradient(rgb(217 70 239 / .25) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(96 165 250 / .2) 1px, transparent 1px);
+}
+
+:root[data-voidwave-ambience='calm'] .voidwave-grid { opacity: .055; }
+:root[data-voidwave-ambience='calm'] .voidwave-orb { opacity: .075; }
+:root[data-voidwave-ambience='calm'] .voidwave-stars { opacity: .28; }
+:root[data-voidwave-ambience='calm'] .voidwave-comets { display: none; }
+:root[data-voidwave-ambience='calm'] .voidwave-spotlight { opacity: .12; }
+
+:root[data-voidwave-ambience='vivid'] .voidwave-grid { opacity: .2; }
+:root[data-voidwave-ambience='vivid'] .voidwave-orb { opacity: .27; }
+:root[data-voidwave-ambience='vivid'] .voidwave-orb-two { opacity: .18; }
+:root[data-voidwave-ambience='vivid'] .voidwave-orb-three { opacity: .16; }
+:root[data-voidwave-ambience='vivid'] .voidwave-stars { filter: drop-shadow(0 0 3px rgb(103 232 249 / .5)); }
+:root[data-voidwave-ambience='vivid'] .voidwave-spotlight { opacity: .48; }
+
+/* OLED mode keeps accents while replacing translucent base surfaces with true black. */
+.voidwave-oled {
+    --vw-void: #000;
+    --vw-deep: #020203;
+    --vw-base: #030304;
+    --vw-panel: rgb(3 3 4 / .94);
+    --vw-panel-solid: #030304;
+    --vw-raised: rgb(14 12 18 / .94);
+    --vw-hover: rgb(25 20 32 / .94);
+}
+
+.voidwave-oled body,
+.voidwave-oled .fi-body { background: #000 !important; }
+.voidwave-oled .fi-sidebar,
+.voidwave-oled .fi-sidebar-header,
+.voidwave-oled .fi-topbar,
+.voidwave-oled .fi-topbar nav { background: rgb(0 0 0 / .94) !important; }
+.voidwave-oled .fi-section:not(.fi-section-not-contained),
+.voidwave-oled .fi-ta-ctn,
+.voidwave-oled .fi-wi-stats-overview-stat,
+.voidwave-oled .fi-fieldset,
+.voidwave-oled .fi-tabs { background: rgb(3 3 4 / .94) !important; }
+.voidwave-oled .voidwave-ambient { opacity: .72; }
+
+#voidwave-preferences { width: min(360px, calc(100vw - 30px)); }
+.voidwave-palettes { grid-template-columns: repeat(4, 1fr); }
+.voidwave-palettes [data-voidwave-palette='nebula'] i { background: linear-gradient(90deg, #8b5cf6, #d946ef, #fb7185); }
+
+.voidwave-ambience-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.voidwave-ambience-options button {
+    padding: 7px 5px;
+    color: var(--vw-muted);
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    background: rgb(255 255 255 / .025);
+    border: 1px solid var(--vw-border);
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.voidwave-ambience-options button:hover,
+.voidwave-ambience-options button:focus-visible,
+.voidwave-ambience-options button[aria-checked='true'] {
+    color: #fff;
+    background: color-mix(in srgb, var(--vw-purple) 11%, transparent);
+    border-color: var(--vw-border-bright);
+}
+
+#voidwave-preferences footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--vw-border);
+}
+
+#voidwave-preferences footer button {
+    padding: 10px;
+    color: var(--vw-muted);
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    background: rgb(255 255 255 / .018);
+    border: 0;
+    cursor: pointer;
+}
+
+#voidwave-preferences footer button + button { border-inline-start: 1px solid var(--vw-border); }
+#voidwave-preferences footer button:hover,
+#voidwave-preferences footer button:focus-visible { color: var(--vw-cyan); background: color-mix(in srgb, var(--vw-cyan) 6%, transparent); }
+
+.voidwave-shortcut {
+    display: block;
+    padding: 6px 10px;
+    color: var(--vw-dim);
+    font-size: 8px;
+    text-align: center;
+    border-top: 1px solid var(--vw-border);
+}
+
+#voidwave-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    z-index: 10001;
+    max-width: min(420px, calc(100vw - 30px));
+    padding: 9px 13px;
+    color: #fff;
+    font: 700 11px/1.3 ui-sans-serif, system-ui, sans-serif;
+    text-align: center;
+    background: rgb(12 8 20 / .94);
+    border: 1px solid var(--vw-border-bright);
+    border-radius: 999px;
+    box-shadow: 0 16px 45px rgb(0 0 0 / .5), 0 0 18px color-mix(in srgb, var(--vw-purple) 13%, transparent);
+    backdrop-filter: blur(16px);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 12px) scale(.96);
+    transition: opacity 180ms ease, transform 220ms cubic-bezier(.16,1,.3,1);
+}
+
+#voidwave-toast.voidwave-toast-visible { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+/* Extra coverage for common Filament workflows. */
+.fi-sc-wizard-header,
+.fi-sc-wizard-step { border-color: var(--vw-border) !important; }
+.fi-sc-wizard-step.fi-active,
+.fi-sc-wizard-step[aria-current='step'] { color: var(--vw-cyan) !important; }
+.fi-in-repeatable-item,
+.fi-fo-repeater-item { border-color: var(--vw-border) !important; background: rgb(10 7 17 / .36) !important; }
+.fi-ta-table thead { backdrop-filter: blur(14px); }
+.fi-ta-table thead th { border-color: var(--vw-border) !important; }
+.fi-fo-date-time-picker-panel { background: rgb(14 10 24 / .97) !important; border: 1px solid var(--vw-border-bright) !important; box-shadow: 0 24px 65px rgb(0 0 0 / .55) !important; }
+.fi-fo-date-time-picker-day:hover { background: color-mix(in srgb, var(--vw-purple) 12%, transparent) !important; }
+.fi-fo-date-time-picker-day.fi-selected { color: #fff !important; background: var(--vw-purple) !important; }
+.fi-global-search-field { transition: width 220ms ease, border-color 180ms ease; }
+.fi-global-search-field:focus-within { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--vw-cyan) 14%, transparent)); }
+
+@media (max-width: 640px) {
+    #voidwave-preferences { width: min(350px, calc(100vw - 20px)); max-height: min(78vh, 650px); overflow-y: auto; }
+    .voidwave-palettes { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #voidwave-toast { transition: none; }
+}

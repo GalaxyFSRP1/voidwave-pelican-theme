@@ -53,8 +53,15 @@ class VoidwaveThemePlugin implements Plugin
     var root = document.documentElement;
     var progressTimer;
     var pointerFrame;
-    var storageKey = 'voidwave-preferences-v1';
-    var defaults = { effects: true, compact: false, contrast: false, palette: 'voidwave' };
+    var storageKey = 'voidwave-preferences-v2';
+    var defaults = {
+        effects: true,
+        compact: false,
+        contrast: false,
+        oled: false,
+        palette: 'voidwave',
+        ambience: 'balanced'
+    };
     var preferences = Object.assign({}, defaults);
 
     function loadPreferences() {
@@ -63,10 +70,17 @@ class VoidwaveThemePlugin implements Plugin
             if (typeof saved.effects === 'boolean') preferences.effects = saved.effects;
             if (typeof saved.compact === 'boolean') preferences.compact = saved.compact;
             if (typeof saved.contrast === 'boolean') preferences.contrast = saved.contrast;
-            if (['voidwave', 'aurora', 'ember'].indexOf(saved.palette) !== -1) preferences.palette = saved.palette;
+            if (typeof saved.oled === 'boolean') preferences.oled = saved.oled;
+            if (['voidwave', 'aurora', 'ember', 'nebula'].indexOf(saved.palette) !== -1) preferences.palette = saved.palette;
+            if (['calm', 'balanced', 'vivid'].indexOf(saved.ambience) !== -1) preferences.ambience = saved.ambience;
 
-            /* Migrate the v1.1 effects-only preference. */
-            if (localStorage.getItem('voidwave-effects') === 'off') preferences.effects = false;
+            /* Migrate preferences from versions 1.1 and 1.2. */
+            var legacy = JSON.parse(localStorage.getItem('voidwave-preferences-v1') || '{}');
+            ['effects', 'compact', 'contrast'].forEach(function (key) {
+                if (typeof legacy[key] === 'boolean' && typeof saved[key] !== 'boolean') preferences[key] = legacy[key];
+            });
+            if (['voidwave', 'aurora', 'ember'].indexOf(legacy.palette) !== -1 && !saved.palette) preferences.palette = legacy.palette;
+            if (localStorage.getItem('voidwave-effects') === 'off' && typeof saved.effects !== 'boolean') preferences.effects = false;
         } catch (e) {}
         applyPreferences();
     }
@@ -75,6 +89,7 @@ class VoidwaveThemePlugin implements Plugin
         try {
             localStorage.setItem(storageKey, JSON.stringify(preferences));
             localStorage.removeItem('voidwave-effects');
+            localStorage.removeItem('voidwave-preferences-v1');
         } catch (e) {}
     }
 
@@ -82,7 +97,9 @@ class VoidwaveThemePlugin implements Plugin
         root.classList.toggle('voidwave-static', !preferences.effects);
         root.classList.toggle('voidwave-compact', preferences.compact);
         root.classList.toggle('voidwave-high-contrast', preferences.contrast);
+        root.classList.toggle('voidwave-oled', preferences.oled);
         root.setAttribute('data-voidwave-palette', preferences.palette);
+        root.setAttribute('data-voidwave-ambience', preferences.ambience);
         syncControls();
     }
 
@@ -102,6 +119,23 @@ class VoidwaveThemePlugin implements Plugin
             var active = button.getAttribute('data-voidwave-palette') === preferences.palette;
             button.setAttribute('aria-checked', active ? 'true' : 'false');
         });
+
+        panel.querySelectorAll('[data-voidwave-ambience]').forEach(function (button) {
+            var active = button.getAttribute('data-voidwave-ambience') === preferences.ambience;
+            button.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+    }
+
+    function showToast(message) {
+        var toast = document.getElementById('voidwave-toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.remove('voidwave-toast-visible');
+        requestAnimationFrame(function () { toast.classList.add('voidwave-toast-visible'); });
+        clearTimeout(window.__voidwaveToastTimer);
+        window.__voidwaveToastTimer = setTimeout(function () {
+            toast.classList.remove('voidwave-toast-visible');
+        }, 1800);
     }
 
     function setupControls() {
@@ -131,21 +165,38 @@ class VoidwaveThemePlugin implements Plugin
         panel.addEventListener('click', function (event) {
             var optionButton = event.target.closest('[data-voidwave-option]');
             var paletteButton = event.target.closest('[data-voidwave-palette]');
+            var ambienceButton = event.target.closest('[data-voidwave-ambience]');
             var resetButton = event.target.closest('[data-voidwave-reset]');
+            var diagnosticsButton = event.target.closest('[data-voidwave-diagnostics]');
 
             if (optionButton) {
                 var option = optionButton.getAttribute('data-voidwave-option');
                 preferences[option] = !preferences[option];
                 savePreferences();
                 applyPreferences();
+                showToast('Appearance updated');
             } else if (paletteButton) {
                 preferences.palette = paletteButton.getAttribute('data-voidwave-palette');
                 savePreferences();
                 applyPreferences();
+                showToast('Palette changed');
+            } else if (ambienceButton) {
+                preferences.ambience = ambienceButton.getAttribute('data-voidwave-ambience');
+                savePreferences();
+                applyPreferences();
+                showToast('Ambience updated');
             } else if (resetButton) {
                 preferences = Object.assign({}, defaults);
                 savePreferences();
                 applyPreferences();
+                showToast('Appearance reset');
+            } else if (diagnosticsButton) {
+                var details = 'Voidwave Theme 1.3.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | effects=' + preferences.effects + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled;
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(details).then(function () { showToast('Diagnostics copied'); });
+                } else {
+                    showToast(details);
+                }
             }
         });
 
@@ -154,6 +205,11 @@ class VoidwaveThemePlugin implements Plugin
         });
 
         document.addEventListener('keydown', function (event) {
+            if (event.altKey && event.key.toLowerCase() === 'v') {
+                event.preventDefault();
+                toggle.click();
+                return;
+            }
             if (event.key === 'Escape' && !panel.hidden) {
                 closePanel();
                 toggle.focus();
@@ -263,15 +319,24 @@ HTML);
             <button type="button" data-voidwave-option="effects" aria-pressed="true"><span><b>Motion effects</b><small>Ambient movement and ripples</small></span><em class="voidwave-option-state">On</em></button>
             <button type="button" data-voidwave-option="compact" aria-pressed="false"><span><b>Compact density</b><small>Fit more information on screen</small></span><em class="voidwave-option-state">Off</em></button>
             <button type="button" data-voidwave-option="contrast" aria-pressed="false"><span><b>High contrast</b><small>Stronger borders and text</small></span><em class="voidwave-option-state">Off</em></button>
+            <button type="button" data-voidwave-option="oled" aria-pressed="false"><span><b>OLED surfaces</b><small>True-black background and chrome</small></span><em class="voidwave-option-state">Off</em></button>
         </div>
         <fieldset><legend>Accent palette</legend><div class="voidwave-palettes">
             <button type="button" data-voidwave-palette="voidwave" role="radio" aria-label="Voidwave purple and cyan" aria-checked="true"><i></i><span>Voidwave</span></button>
             <button type="button" data-voidwave-palette="aurora" role="radio" aria-label="Aurora blue and teal" aria-checked="false"><i></i><span>Aurora</span></button>
             <button type="button" data-voidwave-palette="ember" role="radio" aria-label="Ember orange and red" aria-checked="false"><i></i><span>Ember</span></button>
+            <button type="button" data-voidwave-palette="nebula" role="radio" aria-label="Nebula pink and violet" aria-checked="false"><i></i><span>Nebula</span></button>
         </div></fieldset>
-        <button class="voidwave-reset" type="button" data-voidwave-reset>Reset appearance</button>
+        <fieldset><legend>Ambient intensity</legend><div class="voidwave-ambience-options">
+            <button type="button" data-voidwave-ambience="calm" role="radio" aria-checked="false">Calm</button>
+            <button type="button" data-voidwave-ambience="balanced" role="radio" aria-checked="true">Balanced</button>
+            <button type="button" data-voidwave-ambience="vivid" role="radio" aria-checked="false">Vivid</button>
+        </div></fieldset>
+        <footer><button type="button" data-voidwave-diagnostics>Copy diagnostics</button><button type="button" data-voidwave-reset>Reset</button></footer>
+        <small class="voidwave-shortcut">Shortcut: Alt + V</small>
     </section>
 </div>
+<div id="voidwave-toast" role="status" aria-live="polite"></div>
 HTML);
     }
 
