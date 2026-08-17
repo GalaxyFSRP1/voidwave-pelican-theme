@@ -1,15 +1,23 @@
-# Publishing Voidwave v1.3.0
+# Publishing Voidwave v1.4.0 with working Pelican updates
 
-Two different ZIP files are provided. They are not interchangeable.
+Voidwave now includes `.github/workflows/release.yml`. Pushing a correctly formatted version tag automatically creates the GitHub release, builds the installation ZIP with `plugin.json` at its root, names it `voidwave-theme.zip`, verifies it, and uploads it with a SHA-256 checksum.
+
+## One-time repository setting
+
+Open **Settings → Actions → General → Workflow permissions** in the GitHub repository. Select **Read and write permissions**, then save. The release workflow needs permission to create releases and upload assets.
 
 ## 1. Update the repository source
 
-Extract `voidwave-github-source.zip`, then place its **contents** on the `main` branch of:
+Extract `voidwave-github-source.zip`. Put its **contents**, including the `.github` directory, on the `main` branch of:
 
 https://github.com/GalaxyFSRP1/voidwave-pelican-theme
 
-`plugin.json` must be at the repository root. Commit at least these changed files:
+The repository root must contain `plugin.json`; do not add an extra wrapper folder.
 
+Commit at least:
+
+- `.github/workflows/release.yml`
+- `.github/workflows/validate.yml`
 - `plugin.json`
 - `update.json`
 - `src/VoidwaveThemePlugin.php`
@@ -17,59 +25,64 @@ https://github.com/GalaxyFSRP1/voidwave-pelican-theme
 - `README.md`
 - `CHANGELOG.md`
 - `GITHUB_RELEASE.md`
-- `.github/workflows/validate.yml`
+- `LICENSE`
 
-Confirm the raw files show version 1.3.0:
+Confirm both raw manifests show version 1.4.0:
 
 - https://raw.githubusercontent.com/GalaxyFSRP1/voidwave-pelican-theme/main/plugin.json
 - https://raw.githubusercontent.com/GalaxyFSRP1/voidwave-pelican-theme/main/update.json
 
-## 2. Create the release
+## 2. Push the release tag
 
-Create a release at:
+Do not manually create or rename a release asset. After the source commit is on `main`, create and push the exact lowercase tag:
 
-https://github.com/GalaxyFSRP1/voidwave-pelican-theme/releases/new
-
-Use these exact values:
-
-- **Tag:** `v1.3.0` — lowercase `v`
-- **Target:** `main`
-- **Title:** `Voidwave Theme v1.3.0`
-- **Asset:** `voidwave-theme.zip`
-
-Upload the separate **installation package** named `voidwave-theme.zip`. Do not upload a folder, `voidwave-github-source.zip`, or a file without `.zip`.
-
-Wait for the upload to finish before publishing. The published release must show an Assets entry named exactly `voidwave-theme.zip`.
-
-## 3. Verify automatic updates
-
-This URL must return HTTP 200 and download a valid ZIP:
-
-```text
-https://github.com/GalaxyFSRP1/voidwave-pelican-theme/releases/download/v1.3.0/voidwave-theme.zip
+```bash
+git checkout main
+git pull --ff-only
+git tag v1.4.0
+git push origin v1.4.0
 ```
 
-Test it with:
+The **Package and publish release** workflow will automatically publish:
+
+- `voidwave-theme.zip`
+- `voidwave-theme.zip.sha256`
+
+Watch it under the repository's **Actions** tab. The workflow intentionally fails if the tag, `plugin.json`, `update.json`, or download URL do not agree.
+
+## 3. Verify the updater asset
 
 ```bash
 curl -fL \
-  https://github.com/GalaxyFSRP1/voidwave-pelican-theme/releases/download/v1.3.0/voidwave-theme.zip \
+  https://github.com/GalaxyFSRP1/voidwave-pelican-theme/releases/download/v1.4.0/voidwave-theme.zip \
   -o /tmp/voidwave-theme.zip
 unzip -t /tmp/voidwave-theme.zip
+unzip -p /tmp/voidwave-theme.zip plugin.json | grep version
 ```
 
-Then clear Pelican's cached update response:
+The URL must return HTTP 200, the ZIP test must pass, and the version must be 1.4.0.
+
+## 4. Make Pelican refresh update information
+
+Pelican caches each plugin's `update.json` for 10 minutes. Either wait or clear the cache:
 
 ```bash
 cd /var/www/pelican
 sudo -u www-data php artisan optimize:clear
 ```
 
-## Common causes of a 404
+Pelican's update button can now download and replace Voidwave without importing the ZIP again. Pelican still runs `yarn install` and `yarn build` during an update, so the server needs adequate RAM or swap.
 
-- Release tag uses uppercase `V1.3.0` instead of lowercase `v1.3.0`
-- Release is still a draft
-- Asset was not uploaded
-- Asset has a different name
-- Asset has no `.zip` extension
-- `update.json` was not committed to `main`
+## Important Pelican limitation
+
+Pelican deliberately disables plugin update detection when the panel version is `canary`. Use a stable Pelican release if you want the built-in update button. Also, the built-in updater is download-on-click rather than a silent unattended updater.
+
+## Common failures prevented by the workflow
+
+- Uppercase `V` in the release tag
+- Missing release asset
+- Asset without `.zip`
+- Wrong asset filename
+- Nested wrapper folder in the ZIP
+- Mismatched plugin and updater versions
+- Download URL pointing at a different tag

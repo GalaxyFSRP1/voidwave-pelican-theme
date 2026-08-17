@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.4.0 — Reliable Releases
+
+- Added a much richer layered night sky with nebula clouds and parallax stardust
+- Expanded the shooting-star system to seven staggered paths
+- Added a distant animated void portal with three energy rings
+- Added floating crystalline debris across the background
+- Added optional gently floating dashboard widgets in Vivid ambience mode
+- Added Glass, Solid, and Crystal surface profiles
+- Added a lower-GPU solid mode that removes expensive backdrop blur
+- Added automatic animation pausing while the browser tab is hidden
+- Added reduced-transparency, forced-colors, and print styles
+- Expanded styling for callouts, markdown, split layouts, and error pages
+- Added automatic migration from v1.1 through v1.3 preferences
+- Added a tag-driven GitHub Actions release workflow
+- The release workflow validates versions and URLs, builds the correctly named install ZIP, tests it, generates a checksum, and publishes both assets automatically
+- Bumped plugin and updater manifests to 1.4.0
+
 ## 1.3.0 — Display Profiles
 
 - Added OLED mode with true-black backgrounds, navigation, and content surfaces
