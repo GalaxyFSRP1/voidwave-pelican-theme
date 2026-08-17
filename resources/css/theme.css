@@ -1,0 +1,674 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+/*
+ * Voidwave for Pelican Panel
+ * Author: PhantomVoidTTV
+ * Animated, self-contained, dark-only theme. No remote assets or fonts.
+ */
+
+@theme {
+    --color-void-50: #f4f2ff;
+    --color-void-100: #e8e5f5;
+    --color-void-200: #d2cde4;
+    --color-void-300: #aaa4c0;
+    --color-void-400: #827b9b;
+    --color-void-500: #625c79;
+    --color-void-600: #4a455f;
+    --color-void-700: #353047;
+    --color-void-800: #211d31;
+    --color-void-900: #151120;
+    --color-void-950: #09070f;
+    --color-void-purple: #a855f7;
+    --color-void-violet: #7c3aed;
+    --color-void-cyan: #22d3ee;
+    --color-void-pink: #f472b6;
+}
+
+:root,
+.dark {
+    color-scheme: dark;
+    --vw-void: #07050d;
+    --vw-deep: #0d0917;
+    --vw-base: #120d1f;
+    --vw-panel: rgb(21 16 35 / 0.78);
+    --vw-panel-solid: #151023;
+    --vw-raised: rgb(32 24 51 / 0.82);
+    --vw-hover: rgb(47 35 72 / 0.82);
+    --vw-border: rgb(196 181 253 / 0.14);
+    --vw-border-bright: rgb(168 85 247 / 0.42);
+    --vw-text: #f4f2ff;
+    --vw-muted: #aaa4c0;
+    --vw-dim: #746d8c;
+    --vw-purple: #a855f7;
+    --vw-violet: #7c3aed;
+    --vw-cyan: #22d3ee;
+    --vw-pink: #f472b6;
+    --vw-green: #34d399;
+    --vw-yellow: #fbbf24;
+    --vw-red: #fb7185;
+    --vw-glass: blur(18px) saturate(135%);
+    --vw-shadow: 0 18px 55px rgb(0 0 0 / 0.34), inset 0 1px 0 rgb(255 255 255 / 0.035);
+    --vw-glow: 0 0 0 1px rgb(168 85 247 / 0.11), 0 15px 50px rgb(88 28 135 / 0.18);
+}
+
+html {
+    min-height: 100%;
+    background: var(--vw-void);
+}
+
+body,
+.fi-body {
+    min-height: 100vh;
+    color: var(--vw-text);
+    background:
+        radial-gradient(circle at 50% -20%, rgb(124 58 237 / 0.16), transparent 42rem),
+        linear-gradient(145deg, var(--vw-void), var(--vw-deep) 48%, #0a0712) !important;
+}
+
+::selection {
+    color: #fff;
+    background: rgb(168 85 247 / 0.7);
+}
+
+:focus-visible {
+    outline: 2px solid var(--vw-cyan);
+    outline-offset: 3px;
+}
+
+/* Persistent animated atmosphere — injected once into all three Pelican panels. */
+.voidwave-ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+    isolation: isolate;
+}
+
+.voidwave-grid {
+    position: absolute;
+    inset: -35%;
+    opacity: 0.13;
+    background-image:
+        linear-gradient(rgb(168 85 247 / 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(34 211 238 / 0.2) 1px, transparent 1px);
+    background-size: 72px 72px;
+    transform: perspective(700px) rotateX(62deg) translateY(21%);
+    transform-origin: center center;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, transparent 69%);
+    mask-image: radial-gradient(ellipse at center, #000 0%, transparent 69%);
+    animation: vw-grid-drift 22s linear infinite;
+}
+
+.voidwave-orb {
+    position: absolute;
+    width: min(52rem, 75vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.2;
+    mix-blend-mode: screen;
+    will-change: transform;
+}
+
+.voidwave-orb-one {
+    top: -34%;
+    left: -13%;
+    background: var(--vw-violet);
+    animation: vw-orbit-one 24s ease-in-out infinite alternate;
+}
+
+.voidwave-orb-two {
+    right: -24%;
+    top: 17%;
+    background: var(--vw-cyan);
+    opacity: 0.12;
+    animation: vw-orbit-two 29s ease-in-out infinite alternate;
+}
+
+.voidwave-orb-three {
+    bottom: -45%;
+    left: 29%;
+    background: var(--vw-pink);
+    opacity: 0.1;
+    animation: vw-orbit-three 26s ease-in-out infinite alternate;
+}
+
+.voidwave-stars {
+    position: absolute;
+    inset: 0;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.75);
+    box-shadow:
+        5vw 8vh rgb(255 255 255 / .55), 14vw 22vh rgb(34 211 238 / .5), 25vw 7vh rgb(255 255 255 / .38),
+        32vw 41vh rgb(168 85 247 / .5), 46vw 13vh rgb(255 255 255 / .55), 58vw 31vh rgb(34 211 238 / .45),
+        68vw 9vh rgb(255 255 255 / .48), 77vw 47vh rgb(244 114 182 / .42), 91vw 17vh rgb(255 255 255 / .52),
+        8vw 63vh rgb(168 85 247 / .5), 19vw 82vh rgb(255 255 255 / .42), 36vw 67vh rgb(34 211 238 / .46),
+        51vw 89vh rgb(255 255 255 / .46), 64vw 71vh rgb(168 85 247 / .44), 73vw 92vh rgb(255 255 255 / .5),
+        87vw 66vh rgb(34 211 238 / .44), 96vw 83vh rgb(255 255 255 / .42);
+    animation: vw-twinkle 5s ease-in-out infinite alternate;
+}
+
+.voidwave-stars-b {
+    width: 1px;
+    height: 1px;
+    opacity: .62;
+    transform: translate(3vw, 4vh) scale(.75);
+    animation-delay: -2.7s;
+    animation-duration: 7s;
+}
+
+.voidwave-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 35%, rgb(4 2 8 / .42) 100%);
+}
+
+.fi-layout,
+.fi-simple-layout,
+.fi-main-ctn,
+.fi-main {
+    position: relative;
+    z-index: 1;
+}
+
+.fi-layout,
+.fi-simple-layout,
+.fi-main,
+.fi-main-ctn {
+    background: transparent !important;
+}
+
+/* Type */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading,
+.fi-slideover-heading,
+.fi-ta-header-heading,
+.fi-wi-stats-overview-stat-value {
+    color: var(--vw-text) !important;
+    letter-spacing: -0.025em;
+}
+
+.fi-header-heading {
+    background: linear-gradient(110deg, #fff 20%, #d8b4fe 50%, #67e8f9 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    background-size: 180% auto;
+    animation: vw-heading-shine 8s ease-in-out infinite;
+}
+
+.fi-header-subheading,
+.fi-section-description,
+.fi-fo-field-wrp-helper-text,
+.fi-ta-empty-state-description,
+.fi-wi-stats-overview-stat-description {
+    color: var(--vw-muted) !important;
+}
+
+.fi-fo-field-wrp-label,
+.fi-in-entry-label,
+.fi-ta-header-cell-label,
+.fi-ta-column-header-label {
+    color: #d5d0e4 !important;
+}
+
+a:not(.fi-btn):not(.fi-sidebar-item-btn):not(.fi-sidebar-item-button):not(.fi-topbar-item-btn) {
+    text-decoration-color: rgb(34 211 238 / .45);
+    text-underline-offset: 3px;
+}
+
+/* Navigation chrome */
+.fi-sidebar,
+.fi-sidebar-header {
+    background: rgb(8 6 14 / 0.8) !important;
+    border-color: var(--vw-border) !important;
+    backdrop-filter: var(--vw-glass);
+    -webkit-backdrop-filter: var(--vw-glass);
+}
+
+.fi-sidebar {
+    border-inline-end: 1px solid var(--vw-border);
+}
+
+.fi-sidebar-header {
+    border-bottom: 1px solid var(--vw-border);
+}
+
+.fi-topbar,
+.fi-topbar nav {
+    background: rgb(10 7 17 / 0.72) !important;
+    border-bottom-color: var(--vw-border) !important;
+    backdrop-filter: var(--vw-glass);
+    -webkit-backdrop-filter: var(--vw-glass);
+}
+
+.fi-logo {
+    filter: drop-shadow(0 0 12px rgb(168 85 247 / .28));
+}
+
+.fi-sidebar-group-label {
+    color: var(--vw-dim) !important;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.fi-sidebar-item-btn,
+.fi-sidebar-item-button,
+.fi-topbar-item-btn,
+.fi-topbar-item-button {
+    position: relative;
+    color: #c8c2d8;
+    border: 1px solid transparent;
+    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.fi-sidebar-item-btn:hover,
+.fi-sidebar-item-button:hover,
+.fi-topbar-item-btn:hover,
+.fi-topbar-item-button:hover {
+    color: #fff !important;
+    background: rgb(168 85 247 / .09) !important;
+    border-color: rgb(168 85 247 / .16);
+    transform: translateX(2px);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item-active > .fi-sidebar-item-button,
+.fi-topbar-item.fi-active > .fi-topbar-item-btn,
+.fi-topbar-item-active > .fi-topbar-item-button {
+    color: #fff !important;
+    background: linear-gradient(105deg, rgb(124 58 237 / .26), rgb(34 211 238 / .07)) !important;
+    border-color: rgb(168 85 247 / .32);
+    box-shadow: inset 3px 0 0 var(--vw-purple), 0 8px 24px rgb(88 28 135 / .14);
+}
+
+.fi-sidebar-item.fi-active .fi-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item-active .fi-icon,
+.fi-sidebar-item-active .fi-sidebar-item-label,
+.fi-topbar-item.fi-active .fi-icon,
+.fi-topbar-item.fi-active .fi-topbar-item-label {
+    color: #d8b4fe !important;
+    filter: drop-shadow(0 0 7px rgb(168 85 247 / .55));
+}
+
+/* Glass cards, sections, tables and widgets */
+.fi-section:not(.fi-section-not-contained),
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-fieldset,
+.fi-tabs,
+.fi-tenant-menu {
+    position: relative;
+    background: linear-gradient(145deg, rgb(28 21 45 / .82), rgb(16 12 27 / .74)) !important;
+    border: 1px solid var(--vw-border) !important;
+    box-shadow: var(--vw-shadow) !important;
+    --tw-ring-color: transparent !important;
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+}
+
+.fi-section:not(.fi-section-not-contained),
+.fi-wi-stats-overview-stat,
+.fi-ta-ctn {
+    transition: transform 220ms cubic-bezier(.2,.8,.2,1), border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.fi-section:not(.fi-section-not-contained):hover,
+.fi-wi-stats-overview-stat:hover,
+.fi-ta-ctn:hover {
+    border-color: rgb(168 85 247 / .26) !important;
+    box-shadow: var(--vw-glow), var(--vw-shadow) !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-3px);
+}
+
+.fi-section-header,
+.fi-section-footer,
+.fi-ta-header,
+.fi-ta-header-toolbar,
+.fi-ta-footer,
+.fi-ta-pagination,
+.fi-pagination {
+    border-color: var(--vw-border) !important;
+}
+
+.fi-wi-stats-overview-stat-chart {
+    color: var(--vw-cyan) !important;
+    filter: drop-shadow(0 0 7px rgb(34 211 238 / .22));
+}
+
+/* Buttons */
+.fi-btn {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / .06);
+    transition: transform 170ms ease, box-shadow 170ms ease, filter 170ms ease, background-color 170ms ease;
+}
+
+.fi-btn:hover {
+    transform: translateY(-1px);
+}
+
+.fi-btn:active {
+    transform: translateY(0) scale(.98);
+}
+
+.fi-btn-color-primary:not(.fi-outlined) {
+    color: #fff !important;
+    background: linear-gradient(110deg, var(--vw-violet), var(--vw-purple) 55%, #9333ea) !important;
+    border-color: rgb(216 180 254 / .24) !important;
+    box-shadow: 0 9px 25px rgb(124 58 237 / .28), inset 0 1px 0 rgb(255 255 255 / .18) !important;
+}
+
+.fi-btn-color-primary:not(.fi-outlined):hover {
+    filter: brightness(1.12);
+    box-shadow: 0 12px 32px rgb(124 58 237 / .4), 0 0 18px rgb(168 85 247 / .16) !important;
+}
+
+.fi-btn-color-primary:not(.fi-outlined) .fi-btn-label,
+.fi-btn-color-primary:not(.fi-outlined) .fi-icon {
+    color: #fff !important;
+}
+
+.fi-btn-color-gray:not(.fi-outlined) {
+    color: var(--vw-text) !important;
+    background: var(--vw-raised) !important;
+    border-color: var(--vw-border) !important;
+}
+
+.fi-btn-color-gray:not(.fi-outlined):hover,
+.fi-icon-btn:hover {
+    background: var(--vw-hover) !important;
+    border-color: var(--vw-border-bright) !important;
+}
+
+/* Forms */
+.fi-input-wrp,
+.fi-select,
+.fi-fo-rich-editor,
+.fi-fo-tags-input,
+.fi-fo-key-value,
+.fi-fo-file-upload {
+    color: var(--vw-text) !important;
+    background: rgb(10 7 17 / .7) !important;
+    border: 1px solid var(--vw-border) !important;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .025) !important;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.fi-input,
+.fi-select-input,
+.fi-fo-rich-editor-content,
+.fi-fo-tags-input input,
+.fi-fo-key-value input,
+#send-command {
+    color: var(--vw-text) !important;
+    caret-color: var(--vw-cyan);
+}
+
+.fi-input::placeholder,
+.fi-select-input::placeholder,
+.fi-fo-tags-input input::placeholder,
+#send-command::placeholder {
+    color: var(--vw-dim) !important;
+}
+
+.fi-input-wrp:not(.fi-disabled):focus-within,
+.fi-select:focus-within,
+.fi-fo-rich-editor:focus-within,
+.fi-fo-tags-input:focus-within {
+    background: rgb(16 11 27 / .9) !important;
+    border-color: rgb(34 211 238 / .58) !important;
+    box-shadow: 0 0 0 3px rgb(34 211 238 / .09), 0 0 22px rgb(34 211 238 / .08) !important;
+}
+
+.fi-checkbox-input,
+.fi-radio-input {
+    background-color: var(--vw-deep) !important;
+    border-color: var(--vw-dim) !important;
+}
+
+.fi-checkbox-input:checked,
+.fi-radio-input:checked,
+.fi-fo-toggle.fi-color-custom {
+    color: #fff !important;
+    background-color: var(--vw-purple) !important;
+    border-color: var(--vw-purple) !important;
+    box-shadow: 0 0 12px rgb(168 85 247 / .35);
+}
+
+.fi-fo-field-wrp-error-message { color: var(--vw-red) !important; }
+.fi-invalid { border-color: var(--vw-red) !important; --tw-ring-color: var(--vw-red) !important; }
+
+/* Tables */
+.fi-ta-table > thead,
+.fi-ta-content-header,
+.fi-ta-table-head {
+    background: rgb(8 6 14 / .62) !important;
+}
+
+.fi-ta-row,
+.fi-ta-content-grid > * {
+    border-color: var(--vw-border) !important;
+    transition: background-color 150ms ease;
+}
+
+.fi-ta-row:hover,
+.fi-ta-record:hover {
+    background: linear-gradient(90deg, rgb(168 85 247 / .08), rgb(34 211 238 / .035)) !important;
+}
+
+.fi-ta-selection-indicator {
+    color: #d8b4fe !important;
+    background: rgb(124 58 237 / .14) !important;
+}
+
+/* Tabs, menus, overlays */
+.fi-tabs-item {
+    transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.fi-tabs-item-active,
+.fi-tabs-item[aria-selected='true'] {
+    background: rgb(168 85 247 / .13) !important;
+    box-shadow: inset 0 -2px 0 var(--vw-purple);
+}
+
+.fi-tabs-item-active .fi-tabs-item-label,
+.fi-tabs-item[aria-selected='true'] .fi-tabs-item-label {
+    color: #d8b4fe !important;
+}
+
+.fi-dropdown-panel,
+.fi-global-search-results-ctn,
+.fi-modal-window,
+.fi-slideover,
+.fi-notification {
+    color: var(--vw-text);
+    background: rgb(17 12 28 / .94) !important;
+    border: 1px solid var(--vw-border-bright) !important;
+    box-shadow: 0 26px 80px rgb(0 0 0 / .58), 0 0 35px rgb(88 28 135 / .12) !important;
+    backdrop-filter: blur(24px) saturate(135%);
+    -webkit-backdrop-filter: blur(24px) saturate(135%);
+}
+
+.fi-modal-window,
+.fi-slideover {
+    animation: vw-modal-in 220ms cubic-bezier(.2,.8,.2,1);
+}
+
+.fi-dropdown-list-item:hover,
+.fi-dropdown-list-item:focus-visible,
+.fi-global-search-result:hover,
+.fi-global-search-result:focus-within {
+    background: rgb(168 85 247 / .1) !important;
+}
+
+.fi-modal-close-overlay,
+.fi-sidebar-close-overlay,
+.fi-fo-file-upload-editor-overlay {
+    background: rgb(4 2 8 / .76) !important;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+/* Login, password reset, and other simple pages */
+.fi-simple-layout {
+    isolation: isolate;
+}
+
+.fi-simple-main {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, rgb(29 21 47 / .88), rgb(12 8 21 / .88)) !important;
+    border: 1px solid rgb(168 85 247 / .25);
+    box-shadow: 0 35px 100px rgb(0 0 0 / .55), 0 0 60px rgb(88 28 135 / .16), inset 0 1px 0 rgb(255 255 255 / .055) !important;
+    backdrop-filter: blur(22px) saturate(130%);
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    animation: vw-card-enter 520ms cubic-bezier(.16,1,.3,1);
+}
+
+.fi-simple-main::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--vw-purple), var(--vw-cyan), transparent);
+    background-size: 200% 100%;
+    animation: vw-border-flow 5s linear infinite;
+}
+
+/* Console, editor and code remain high-contrast. */
+#terminal,
+.xterm,
+.xterm .xterm-viewport,
+.xterm .xterm-screen,
+#send-command {
+    background-color: #050308 !important;
+}
+
+#terminal {
+    border: 1px solid var(--vw-border);
+    border-bottom: 0;
+    box-shadow: 0 18px 55px rgb(0 0 0 / .38), 0 0 28px rgb(34 211 238 / .035);
+}
+
+#send-command { border-color: var(--vw-border) !important; }
+
+code,
+pre,
+.fi-code {
+    color: #a7f3d0 !important;
+    background-color: #07050d !important;
+    border-color: var(--vw-border) !important;
+}
+
+.filepond--panel-root,
+.filepond--drop-label,
+.filepond--item-panel {
+    color: var(--vw-text) !important;
+    background-color: var(--vw-raised) !important;
+}
+
+.fi-progress-bar {
+    background: linear-gradient(90deg, var(--vw-violet), var(--vw-cyan)) !important;
+    box-shadow: 0 0 12px rgb(34 211 238 / .3);
+}
+
+/* Scrollbars */
+* { scrollbar-color: #514667 var(--vw-deep); }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: var(--vw-deep); }
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--vw-purple), #514667);
+    border: 2px solid var(--vw-deep);
+    border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover { background: linear-gradient(var(--vw-cyan), var(--vw-purple)); }
+
+@keyframes vw-grid-drift {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 72px 72px, 72px 72px; }
+}
+
+@keyframes vw-orbit-one {
+    0% { transform: translate3d(-4%, -4%, 0) scale(.9); }
+    100% { transform: translate3d(28%, 17%, 0) scale(1.16); }
+}
+
+@keyframes vw-orbit-two {
+    0% { transform: translate3d(9%, -12%, 0) scale(.86); }
+    100% { transform: translate3d(-30%, 22%, 0) scale(1.1); }
+}
+
+@keyframes vw-orbit-three {
+    0% { transform: translate3d(-16%, 5%, 0) scale(.94); }
+    100% { transform: translate3d(24%, -22%, 0) scale(1.12); }
+}
+
+@keyframes vw-twinkle {
+    0%, 100% { opacity: .28; filter: drop-shadow(0 0 0 transparent); }
+    45% { opacity: .78; filter: drop-shadow(0 0 3px rgb(103 232 249 / .5)); }
+}
+
+@keyframes vw-heading-shine {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+@keyframes vw-modal-in {
+    from { opacity: 0; transform: translateY(10px) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes vw-card-enter {
+    from { opacity: 0; transform: translateY(18px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes vw-border-flow {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+@media (max-width: 768px) {
+    .voidwave-grid { opacity: .085; background-size: 54px 54px; }
+    .voidwave-orb { filter: blur(70px); opacity: .15; }
+    .fi-section:not(.fi-section-not-contained):hover,
+    .fi-wi-stats-overview-stat:hover,
+    .fi-ta-ctn:hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+
+    .voidwave-grid,
+    .voidwave-orb,
+    .voidwave-stars { animation: none !important; }
+}
+
+@media (prefers-contrast: more) {
+    :root,
+    .dark {
+        --vw-border: rgb(216 180 254 / .38);
+        --vw-muted: #d2cde4;
+        --vw-dim: #aaa4c0;
+    }
+
+    .voidwave-ambient { opacity: .45; }
+}
