@@ -1,4 +1,4 @@
-# Publishing Voidwave v1.5.0 with working Pelican updates
+# Publishing Voidwave v1.6.0 with working Pelican updates
 
 Voidwave now includes `.github/workflows/release.yml`. Pushing a correctly formatted version tag automatically creates the GitHub release, builds the installation ZIP with `plugin.json` at its root, names it `voidwave-theme.zip`, verifies it, and uploads it with a SHA-256 checksum.
 
@@ -31,7 +31,7 @@ Commit at least:
 - `GITHUB_RELEASE.md`
 - `LICENSE`
 
-Confirm both raw manifests show version 1.5.0:
+Confirm both raw manifests show version 1.6.0:
 
 - https://raw.githubusercontent.com/GalaxyFSRP1/voidwave-pelican-theme/main/plugin.json
 - https://raw.githubusercontent.com/GalaxyFSRP1/voidwave-pelican-theme/main/update.json
@@ -43,8 +43,8 @@ Do not manually create or rename a release asset. After the source commit is on 
 ```bash
 git checkout main
 git pull --ff-only
-git tag v1.5.0
-git push origin v1.5.0
+git tag v1.6.0
+git push origin v1.6.0
 ```
 
 The **Package and publish release** workflow will automatically publish:
@@ -58,13 +58,13 @@ Watch it under the repository's **Actions** tab. The workflow intentionally fail
 
 ```bash
 curl -fL \
-  https://github.com/GalaxyFSRP1/voidwave-pelican-theme/releases/download/v1.5.0/voidwave-theme.zip \
+  https://github.com/GalaxyFSRP1/voidwave-pelican-theme/releases/download/v1.6.0/voidwave-theme.zip \
   -o /tmp/voidwave-theme.zip
 unzip -t /tmp/voidwave-theme.zip
 unzip -p /tmp/voidwave-theme.zip plugin.json | grep version
 ```
 
-The URL must return HTTP 200, the ZIP test must pass, and the version must be 1.5.0.
+The URL must return HTTP 200, the ZIP test must pass, and the version must be 1.6.0.
 
 ## 4. Make Pelican refresh update information
 

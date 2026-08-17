@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.6.0 — Void Command Center
+
+- Added one-click Performance, Balanced, and Cinematic appearance presets
+- Added independent Sparse, Normal, and Galaxy sky-density controls
+- Added Sharp, Soft, and Round corner profiles across cards, dialogs, inputs, buttons, tabs, and navigation
+- Added separate synchronized controls for cursor stardust and floating interface accents
+- Added administrator defaults for cursor effects, floating accents, sky density, and corner style
+- Added automatic browser reduced-data detection that disables expensive background layers and blur
+- Added compact handling for short-height displays and a scrollable appearance center
+- Expanded account synchronization and diagnostics to all new options
+- Added automatic migration from v1.1 through v1.5 preferences
+- Bumped plugin and updater manifests to 1.6.0
+
 ## 1.5.0 — Synced Across the Void
 
 - Added an official Pelican plugin settings page for administrator defaults

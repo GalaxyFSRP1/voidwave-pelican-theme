@@ -23,7 +23,7 @@ class PreferencesController extends Controller
         }
 
         return response()->json([
-            'version' => '1.5.0',
+            'version' => '1.6.0',
             'authenticated' => $user !== null,
             'allow_user_overrides' => (bool) config('voidwave-theme.allow_user_overrides', true),
             'sync_preferences' => (bool) config('voidwave-theme.sync_preferences', true),
@@ -43,9 +43,13 @@ class PreferencesController extends Controller
             'compact' => ['required', 'boolean'],
             'contrast' => ['required', 'boolean'],
             'oled' => ['required', 'boolean'],
+            'cursor' => ['required', 'boolean'],
+            'floating' => ['required', 'boolean'],
             'palette' => ['required', Rule::in(['voidwave', 'aurora', 'ember', 'nebula'])],
             'ambience' => ['required', Rule::in(['calm', 'balanced', 'vivid'])],
             'surface' => ['required', Rule::in(['glass', 'solid', 'crystal'])],
+            'sky' => ['required', Rule::in(['sparse', 'normal', 'galaxy'])],
+            'radius' => ['required', Rule::in(['sharp', 'soft', 'round'])],
         ]);
 
         $user = $request->user();
@@ -92,9 +96,13 @@ class PreferencesController extends Controller
             'compact' => (bool) ($defaults['compact'] ?? false),
             'contrast' => (bool) ($defaults['contrast'] ?? false),
             'oled' => (bool) ($defaults['oled'] ?? false),
+            'cursor' => (bool) ($defaults['cursor'] ?? true),
+            'floating' => (bool) ($defaults['floating'] ?? true),
             'palette' => in_array($defaults['palette'] ?? null, ['voidwave', 'aurora', 'ember', 'nebula'], true) ? $defaults['palette'] : 'voidwave',
             'ambience' => in_array($defaults['ambience'] ?? null, ['calm', 'balanced', 'vivid'], true) ? $defaults['ambience'] : 'balanced',
             'surface' => in_array($defaults['surface'] ?? null, ['glass', 'solid', 'crystal'], true) ? $defaults['surface'] : 'glass',
+            'sky' => in_array($defaults['sky'] ?? null, ['sparse', 'normal', 'galaxy'], true) ? $defaults['sky'] : 'normal',
+            'radius' => in_array($defaults['radius'] ?? null, ['sharp', 'soft', 'round'], true) ? $defaults['radius'] : 'soft',
         ];
     }
 }

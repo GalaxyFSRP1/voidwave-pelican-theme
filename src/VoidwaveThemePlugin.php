@@ -47,9 +47,13 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             'default_compact' => config('voidwave-theme.defaults.compact', false),
             'default_contrast' => config('voidwave-theme.defaults.contrast', false),
             'default_oled' => config('voidwave-theme.defaults.oled', false),
+            'default_cursor' => config('voidwave-theme.defaults.cursor', true),
+            'default_floating' => config('voidwave-theme.defaults.floating', true),
             'default_palette' => config('voidwave-theme.defaults.palette', 'voidwave'),
             'default_ambience' => config('voidwave-theme.defaults.ambience', 'balanced'),
             'default_surface' => config('voidwave-theme.defaults.surface', 'glass'),
+            'default_sky' => config('voidwave-theme.defaults.sky', 'normal'),
+            'default_radius' => config('voidwave-theme.defaults.radius', 'soft'),
         ];
     }
 
@@ -72,6 +76,8 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             Toggle::make('default_compact')->label('Default compact density')->inline(false),
             Toggle::make('default_contrast')->label('Default high contrast')->inline(false),
             Toggle::make('default_oled')->label('Default OLED mode')->inline(false),
+            Toggle::make('default_cursor')->label('Default cursor stardust')->inline(false),
+            Toggle::make('default_floating')->label('Default floating interface accents')->inline(false),
             Select::make('default_palette')
                 ->label('Default accent palette')
                 ->options([
@@ -97,6 +103,22 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                     'crystal' => 'Crystal',
                 ])
                 ->required(),
+            Select::make('default_sky')
+                ->label('Default sky density')
+                ->options([
+                    'sparse' => 'Sparse',
+                    'normal' => 'Normal',
+                    'galaxy' => 'Galaxy',
+                ])
+                ->required(),
+            Select::make('default_radius')
+                ->label('Default corner style')
+                ->options([
+                    'sharp' => 'Sharp',
+                    'soft' => 'Soft',
+                    'round' => 'Round',
+                ])
+                ->required(),
         ];
     }
 
@@ -111,9 +133,13 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             'VOIDWAVE_DEFAULT_COMPACT' => (bool) ($data['default_compact'] ?? false),
             'VOIDWAVE_DEFAULT_CONTRAST' => (bool) ($data['default_contrast'] ?? false),
             'VOIDWAVE_DEFAULT_OLED' => (bool) ($data['default_oled'] ?? false),
+            'VOIDWAVE_DEFAULT_CURSOR' => (bool) ($data['default_cursor'] ?? true),
+            'VOIDWAVE_DEFAULT_FLOATING' => (bool) ($data['default_floating'] ?? true),
             'VOIDWAVE_DEFAULT_PALETTE' => $data['default_palette'] ?? 'voidwave',
             'VOIDWAVE_DEFAULT_AMBIENCE' => $data['default_ambience'] ?? 'balanced',
             'VOIDWAVE_DEFAULT_SURFACE' => $data['default_surface'] ?? 'glass',
+            'VOIDWAVE_DEFAULT_SKY' => $data['default_sky'] ?? 'normal',
+            'VOIDWAVE_DEFAULT_RADIUS' => $data['default_radius'] ?? 'soft',
         ]);
 
         Notification::make()
@@ -151,15 +177,19 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     var lastSparkle = 0;
     var hasLocalPreferences = false;
     var syncStatus = { authenticated: false, enabled: false, overrides: true, showControls: true, loaded: false, message: 'Loading preferences…' };
-    var storageKey = 'voidwave-preferences-v4';
+    var storageKey = 'voidwave-preferences-v5';
     var defaults = {
         effects: true,
         compact: false,
         contrast: false,
         oled: false,
+        cursor: true,
+        floating: true,
         palette: 'voidwave',
         ambience: 'balanced',
-        surface: 'glass'
+        surface: 'glass',
+        sky: 'normal',
+        radius: 'soft'
     };
     var preferences = Object.assign({}, defaults);
 
@@ -171,21 +201,29 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             if (typeof saved.compact === 'boolean') preferences.compact = saved.compact;
             if (typeof saved.contrast === 'boolean') preferences.contrast = saved.contrast;
             if (typeof saved.oled === 'boolean') preferences.oled = saved.oled;
+            if (typeof saved.cursor === 'boolean') preferences.cursor = saved.cursor;
+            if (typeof saved.floating === 'boolean') preferences.floating = saved.floating;
             if (['voidwave', 'aurora', 'ember', 'nebula'].indexOf(saved.palette) !== -1) preferences.palette = saved.palette;
             if (['calm', 'balanced', 'vivid'].indexOf(saved.ambience) !== -1) preferences.ambience = saved.ambience;
             if (['glass', 'solid', 'crystal'].indexOf(saved.surface) !== -1) preferences.surface = saved.surface;
+            if (['sparse', 'normal', 'galaxy'].indexOf(saved.sky) !== -1) preferences.sky = saved.sky;
+            if (['sharp', 'soft', 'round'].indexOf(saved.radius) !== -1) preferences.radius = saved.radius;
 
-            /* Migrate preferences from versions 1.1 through 1.4. */
+            /* Migrate preferences from versions 1.1 through 1.5. */
+            var legacyV4 = JSON.parse(localStorage.getItem('voidwave-preferences-v4') || '{}');
             var legacyV3 = JSON.parse(localStorage.getItem('voidwave-preferences-v3') || '{}');
             var legacyV2 = JSON.parse(localStorage.getItem('voidwave-preferences-v2') || '{}');
             var legacyV1 = JSON.parse(localStorage.getItem('voidwave-preferences-v1') || '{}');
-            var legacy = Object.assign({}, legacyV1, legacyV2, legacyV3);
+            var legacy = Object.assign({}, legacyV1, legacyV2, legacyV3, legacyV4);
             if (!hasLocalPreferences && Object.keys(legacy).length > 0) hasLocalPreferences = true;
-            ['effects', 'compact', 'contrast', 'oled'].forEach(function (key) {
+            ['effects', 'compact', 'contrast', 'oled', 'cursor', 'floating'].forEach(function (key) {
                 if (typeof legacy[key] === 'boolean' && typeof saved[key] !== 'boolean') preferences[key] = legacy[key];
             });
             if (['voidwave', 'aurora', 'ember', 'nebula'].indexOf(legacy.palette) !== -1 && !saved.palette) preferences.palette = legacy.palette;
             if (['calm', 'balanced', 'vivid'].indexOf(legacy.ambience) !== -1 && !saved.ambience) preferences.ambience = legacy.ambience;
+            if (['glass', 'solid', 'crystal'].indexOf(legacy.surface) !== -1 && !saved.surface) preferences.surface = legacy.surface;
+            if (['sparse', 'normal', 'galaxy'].indexOf(legacy.sky) !== -1 && !saved.sky) preferences.sky = legacy.sky;
+            if (['sharp', 'soft', 'round'].indexOf(legacy.radius) !== -1 && !saved.radius) preferences.radius = legacy.radius;
             if (localStorage.getItem('voidwave-effects') === 'off' && typeof saved.effects !== 'boolean') preferences.effects = false;
         } catch (e) {}
         applyPreferences();
@@ -198,6 +236,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             localStorage.removeItem('voidwave-preferences-v1');
             localStorage.removeItem('voidwave-preferences-v2');
             localStorage.removeItem('voidwave-preferences-v3');
+            localStorage.removeItem('voidwave-preferences-v4');
             hasLocalPreferences = true;
         } catch (e) {}
         if (!skipSync) schedulePreferenceSync();
@@ -206,12 +245,14 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     function mergeValidPreferences(base, incoming) {
         var next = Object.assign({}, base);
         if (!incoming || typeof incoming !== 'object') return next;
-        ['effects', 'compact', 'contrast', 'oled'].forEach(function (key) {
+        ['effects', 'compact', 'contrast', 'oled', 'cursor', 'floating'].forEach(function (key) {
             if (typeof incoming[key] === 'boolean') next[key] = incoming[key];
         });
         if (['voidwave', 'aurora', 'ember', 'nebula'].indexOf(incoming.palette) !== -1) next.palette = incoming.palette;
         if (['calm', 'balanced', 'vivid'].indexOf(incoming.ambience) !== -1) next.ambience = incoming.ambience;
         if (['glass', 'solid', 'crystal'].indexOf(incoming.surface) !== -1) next.surface = incoming.surface;
+        if (['sparse', 'normal', 'galaxy'].indexOf(incoming.sky) !== -1) next.sky = incoming.sky;
+        if (['sharp', 'soft', 'round'].indexOf(incoming.radius) !== -1) next.radius = incoming.radius;
         return next;
     }
 
@@ -334,9 +375,12 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         root.classList.toggle('voidwave-compact', preferences.compact);
         root.classList.toggle('voidwave-high-contrast', preferences.contrast);
         root.classList.toggle('voidwave-oled', preferences.oled);
+        root.classList.toggle('voidwave-no-float', !preferences.floating);
         root.setAttribute('data-voidwave-palette', preferences.palette);
         root.setAttribute('data-voidwave-ambience', preferences.ambience);
         root.setAttribute('data-voidwave-surface', preferences.surface);
+        root.setAttribute('data-voidwave-sky', preferences.sky);
+        root.setAttribute('data-voidwave-radius', preferences.radius);
         syncControls();
     }
 
@@ -364,6 +408,16 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
 
         panel.querySelectorAll('[data-voidwave-surface]').forEach(function (button) {
             var active = button.getAttribute('data-voidwave-surface') === preferences.surface;
+            button.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+
+        panel.querySelectorAll('[data-voidwave-sky]').forEach(function (button) {
+            var active = button.getAttribute('data-voidwave-sky') === preferences.sky;
+            button.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+
+        panel.querySelectorAll('[data-voidwave-radius]').forEach(function (button) {
+            var active = button.getAttribute('data-voidwave-radius') === preferences.radius;
             button.setAttribute('aria-checked', active ? 'true' : 'false');
         });
     }
@@ -411,6 +465,9 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             var paletteButton = event.target.closest('[data-voidwave-palette]');
             var ambienceButton = event.target.closest('[data-voidwave-ambience]');
             var surfaceButton = event.target.closest('[data-voidwave-surface]');
+            var skyButton = event.target.closest('[data-voidwave-sky]');
+            var radiusButton = event.target.closest('[data-voidwave-radius]');
+            var presetButton = event.target.closest('[data-voidwave-preset]');
             var resetButton = event.target.closest('[data-voidwave-reset]');
             var diagnosticsButton = event.target.closest('[data-voidwave-diagnostics]');
 
@@ -435,6 +492,24 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                 savePreferences();
                 applyPreferences();
                 showToast('Surface style updated');
+            } else if (skyButton) {
+                preferences.sky = skyButton.getAttribute('data-voidwave-sky');
+                savePreferences();
+                applyPreferences();
+                showToast('Sky density updated');
+            } else if (radiusButton) {
+                preferences.radius = radiusButton.getAttribute('data-voidwave-radius');
+                savePreferences();
+                applyPreferences();
+                showToast('Corner style updated');
+            } else if (presetButton) {
+                var preset = presetButton.getAttribute('data-voidwave-preset');
+                if (preset === 'performance') Object.assign(preferences, { effects: false, cursor: false, floating: false, ambience: 'calm', surface: 'solid', sky: 'sparse', radius: 'sharp' });
+                if (preset === 'balanced') Object.assign(preferences, { effects: true, cursor: true, floating: true, ambience: 'balanced', surface: 'glass', sky: 'normal', radius: 'soft' });
+                if (preset === 'cinematic') Object.assign(preferences, { effects: true, cursor: true, floating: true, ambience: 'vivid', surface: 'crystal', sky: 'galaxy', radius: 'round' });
+                savePreferences();
+                applyPreferences();
+                showToast(preset.charAt(0).toUpperCase() + preset.slice(1) + ' preset applied');
             } else if (resetButton) {
                 preferences = Object.assign({}, defaults);
                 try { localStorage.removeItem(storageKey); } catch (e) {}
@@ -443,7 +518,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                 resetSyncedPreferences();
                 showToast('Using panel defaults');
             } else if (diagnosticsButton) {
-                var details = 'Voidwave Theme 1.5.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | effects=' + preferences.effects + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
+                var details = 'Voidwave Theme 1.6.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(details).then(function () { showToast('Diagnostics copied'); });
                 } else {
@@ -457,7 +532,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         });
 
         document.addEventListener('keydown', function (event) {
-            if (event.altKey && event.key.toLowerCase() === 'v') {
+            if (event.altKey && event.key.toLowerCase() === 'v' && !toggle.hidden) {
                 event.preventDefault();
                 toggle.click();
                 return;
@@ -510,11 +585,14 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     document.addEventListener('visibilitychange', syncPageVisibility);
     syncPageVisibility();
 
+    var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (connection && connection.saveData) root.classList.add('voidwave-data-saver');
+
     document.addEventListener('pointermove', function (event) {
         if (!preferences.effects) return;
 
         var now = Date.now();
-        if (preferences.ambience === 'vivid' && now - lastSparkle > 85 && window.matchMedia('(pointer: fine)').matches) {
+        if (preferences.cursor && preferences.ambience === 'vivid' && now - lastSparkle > 85 && window.matchMedia('(pointer: fine)').matches) {
             lastSparkle = now;
             var sparkle = document.createElement('i');
             sparkle.className = 'voidwave-cursor-sparkle';
@@ -594,11 +672,18 @@ HTML);
     </button>
     <section id="voidwave-preferences" aria-label="Voidwave appearance preferences" hidden>
         <header><div><strong>Appearance</strong><small id="voidwave-sync-state">Loading preferences…</small></div><span aria-hidden="true">✦</span></header>
+        <div class="voidwave-presets" aria-label="Quick appearance presets">
+            <button type="button" data-voidwave-preset="performance"><b>Performance</b><small>Low GPU</small></button>
+            <button type="button" data-voidwave-preset="balanced"><b>Balanced</b><small>Recommended</small></button>
+            <button type="button" data-voidwave-preset="cinematic"><b>Cinematic</b><small>Maximum void</small></button>
+        </div>
         <div class="voidwave-option-list">
             <button type="button" data-voidwave-option="effects" aria-pressed="true"><span><b>Motion effects</b><small>Ambient movement and ripples</small></span><em class="voidwave-option-state">On</em></button>
             <button type="button" data-voidwave-option="compact" aria-pressed="false"><span><b>Compact density</b><small>Fit more information on screen</small></span><em class="voidwave-option-state">Off</em></button>
             <button type="button" data-voidwave-option="contrast" aria-pressed="false"><span><b>High contrast</b><small>Stronger borders and text</small></span><em class="voidwave-option-state">Off</em></button>
             <button type="button" data-voidwave-option="oled" aria-pressed="false"><span><b>OLED surfaces</b><small>True-black background and chrome</small></span><em class="voidwave-option-state">Off</em></button>
+            <button type="button" data-voidwave-option="cursor" aria-pressed="true"><span><b>Cursor stardust</b><small>Interactive particles in Vivid mode</small></span><em class="voidwave-option-state">On</em></button>
+            <button type="button" data-voidwave-option="floating" aria-pressed="true"><span><b>Floating accents</b><small>Portal, shards, icons, and widgets</small></span><em class="voidwave-option-state">On</em></button>
         </div>
         <fieldset><legend>Accent palette</legend><div class="voidwave-palettes">
             <button type="button" data-voidwave-palette="voidwave" role="radio" aria-label="Voidwave purple and cyan" aria-checked="true"><i></i><span>Voidwave</span></button>
@@ -615,6 +700,16 @@ HTML);
             <button type="button" data-voidwave-surface="glass" role="radio" aria-checked="true">Glass</button>
             <button type="button" data-voidwave-surface="solid" role="radio" aria-checked="false">Solid</button>
             <button type="button" data-voidwave-surface="crystal" role="radio" aria-checked="false">Crystal</button>
+        </div></fieldset>
+        <fieldset><legend>Sky density</legend><div class="voidwave-sky-options">
+            <button type="button" data-voidwave-sky="sparse" role="radio" aria-checked="false">Sparse</button>
+            <button type="button" data-voidwave-sky="normal" role="radio" aria-checked="true">Normal</button>
+            <button type="button" data-voidwave-sky="galaxy" role="radio" aria-checked="false">Galaxy</button>
+        </div></fieldset>
+        <fieldset><legend>Corner style</legend><div class="voidwave-radius-options">
+            <button type="button" data-voidwave-radius="sharp" role="radio" aria-checked="false">Sharp</button>
+            <button type="button" data-voidwave-radius="soft" role="radio" aria-checked="true">Soft</button>
+            <button type="button" data-voidwave-radius="round" role="radio" aria-checked="false">Round</button>
         </div></fieldset>
         <footer><button type="button" data-voidwave-diagnostics>Copy diagnostics</button><button type="button" data-voidwave-reset>Reset</button></footer>
         <small class="voidwave-shortcut">Shortcut: Alt + V</small>
