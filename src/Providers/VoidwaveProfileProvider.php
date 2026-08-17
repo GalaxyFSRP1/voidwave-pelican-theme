@@ -5,8 +5,11 @@ namespace PhantomVoidTTV\VoidwaveTheme\Providers;
 use App\Enums\TabPosition;
 use App\Enums\TablerIcon;
 use App\Filament\Pages\Auth\EditProfile;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +29,22 @@ class VoidwaveProfileProvider extends ServiceProvider
                         ->icon(TablerIcon::Palette)
                         ->columns(2)
                         ->schema($this->appearanceFields()),
+                    Actions::make([
+                        Action::make('reset_voidwave_preferences')
+                            ->label('Reset to administrator defaults')
+                            ->color('gray')
+                            ->requiresConfirmation()
+                            ->action(function () {
+                                $this->resetPreferences();
+                                Notification::make()
+                                    ->title('Voidwave preferences reset')
+                                    ->body('Administrator defaults will be used on every device.')
+                                    ->success()
+                                    ->send();
+
+                                return redirect(request()->fullUrl());
+                            }),
+                    ]),
                 ]),
         );
     }
@@ -128,7 +147,7 @@ class VoidwaveProfileProvider extends ServiceProvider
                 ->afterStateUpdated(fn (string $state) => $this->savePreference('radius', $state)),
             Select::make('voidwave_scene')
                 ->label('Celestial scene')
-                ->options(['none' => 'None', 'eclipse' => 'Void Eclipse', 'rings' => 'Ringed World'])
+                ->options(['none' => 'None', 'eclipse' => 'Void Eclipse', 'rings' => 'Ringed World', 'blackhole' => 'Black Hole'])
                 ->selectablePlaceholder(false)
                 ->required()
                 ->default(fn (): string => (string) $this->preference('scene'))
@@ -146,6 +165,16 @@ class VoidwaveProfileProvider extends ServiceProvider
                 ->dehydrated(false)
                 ->live()
                 ->afterStateUpdated(fn (string $state) => $this->savePreference('speed', $state)),
+            Select::make('voidwave_glow')
+                ->label('Glow intensity')
+                ->options(['subtle' => 'Subtle', 'normal' => 'Normal', 'intense' => 'Intense'])
+                ->selectablePlaceholder(false)
+                ->required()
+                ->default(fn (): string => (string) $this->preference('glow'))
+                ->disabled(fn (): bool => !$this->overridesAllowed())
+                ->dehydrated(false)
+                ->live()
+                ->afterStateUpdated(fn (string $state) => $this->savePreference('glow', $state)),
         ];
     }
 
@@ -162,6 +191,19 @@ class VoidwaveProfileProvider extends ServiceProvider
         $stored = is_array($customization['voidwave'] ?? null) ? $customization['voidwave'] : [];
 
         return $stored[$key] ?? $defaults[$key];
+    }
+
+    private function resetPreferences(): void
+    {
+        if (!user()) {
+            return;
+        }
+
+        $user = user();
+        $customization = $user->customization ?? [];
+        unset($customization['voidwave']);
+        $user->customization = $customization;
+        $user->save();
     }
 
     private function savePreference(string $key, bool|string $value): void

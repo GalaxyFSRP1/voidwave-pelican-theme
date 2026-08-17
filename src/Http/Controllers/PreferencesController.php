@@ -23,7 +23,7 @@ class PreferencesController extends Controller
         }
 
         return response()->json([
-            'version' => '1.8.0',
+            'version' => '1.9.0',
             'authenticated' => $user !== null,
             'allow_user_overrides' => (bool) config('voidwave-theme.allow_user_overrides', true),
             'sync_preferences' => (bool) config('voidwave-theme.sync_preferences', true),
@@ -50,8 +50,9 @@ class PreferencesController extends Controller
             'surface' => ['required', Rule::in(['glass', 'solid', 'crystal'])],
             'sky' => ['required', Rule::in(['sparse', 'normal', 'galaxy'])],
             'radius' => ['required', Rule::in(['sharp', 'soft', 'round'])],
-            'scene' => ['required', Rule::in(['none', 'eclipse', 'rings'])],
+            'scene' => ['required', Rule::in(['none', 'eclipse', 'rings', 'blackhole'])],
             'speed' => ['required', Rule::in(['slow', 'normal', 'fast'])],
+            'glow' => ['required', Rule::in(['subtle', 'normal', 'intense'])],
         ]);
 
         $user = $request->user();
@@ -105,8 +106,9 @@ class PreferencesController extends Controller
             'surface' => in_array($defaults['surface'] ?? null, ['glass', 'solid', 'crystal'], true) ? $defaults['surface'] : 'glass',
             'sky' => in_array($defaults['sky'] ?? null, ['sparse', 'normal', 'galaxy'], true) ? $defaults['sky'] : 'normal',
             'radius' => in_array($defaults['radius'] ?? null, ['sharp', 'soft', 'round'], true) ? $defaults['radius'] : 'soft',
-            'scene' => in_array($defaults['scene'] ?? null, ['none', 'eclipse', 'rings'], true) ? $defaults['scene'] : 'eclipse',
+            'scene' => in_array($defaults['scene'] ?? null, ['none', 'eclipse', 'rings', 'blackhole'], true) ? $defaults['scene'] : 'eclipse',
             'speed' => in_array($defaults['speed'] ?? null, ['slow', 'normal', 'fast'], true) ? $defaults['speed'] : 'normal',
+            'glow' => in_array($defaults['glow'] ?? null, ['subtle', 'normal', 'intense'], true) ? $defaults['glow'] : 'normal',
         ];
     }
 }

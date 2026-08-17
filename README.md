@@ -73,10 +73,15 @@ The old floating **VOIDWAVE** launcher has been removed. Users now configure the
 - Glass, Solid, and Crystal surfaces
 - Sparse, Normal, and Galaxy sky density
 - Sharp, Soft, and Round corners
-- None, Void Eclipse, and Ringed World celestial scenes
+- None, Void Eclipse, Ringed World, and Black Hole celestial scenes
 - Slow, Normal, and Fast animation speeds
+- Subtle, Normal, and Intense glow intensity
+- A confirmed reset action that returns every option to administrator defaults
+- Subtle, Normal, and Intense synchronized glow profiles
+- None, Void Eclipse, Ringed World, and gravitationally lensed Black Hole scenes
+- Native reset-to-administrator-defaults action with confirmation
 
-Changes save directly to the signed-in Pelican account and refresh the active theme. Version 1.8 automatically migrates preferences from versions 1.1 through 1.7.
+Changes save directly to the signed-in Pelican account and refresh the active theme. Version 1.9 automatically migrates preferences from versions 1.1 through 1.8.
 
 ## Administrator defaults and user customization
 
@@ -91,7 +96,7 @@ When synchronization is enabled, authenticated preferences are stored inside Pel
 **Name:** Voidwave Theme  
 **Category:** Themes  
 **Author:** PhantomVoidTTV  
-**Version:** 1.8.0  
+**Version:** 1.9.0  
 **License:** MIT
 
 **Short description:**
@@ -107,7 +112,7 @@ Suggested tags: `theme`, `dark`, `animated`, `interactive`, `neon`, `purple`, `c
 ## Publishing checklist
 
 1. Push this source tree to `GalaxyFSRP1/voidwave-pelican-theme` on the `main` branch.
-2. Push the tag `v1.8.0` (lowercase `v`).
+2. Push the tag `v1.9.0` (lowercase `v`).
 3. Let `.github/workflows/release.yml` create the release and attach `voidwave-theme.zip` automatically.
 4. Capture clean screenshots of login, dashboard, server overview, and console pages on a test panel.
 5. Submit the plugin on Pelican Hub using the listing copy above.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.9.0 — Event Horizon
+
+- Added a synchronized Subtle, Normal, and Intense glow profile
+- Added administrator and profile controls for glow intensity
+- Added a gravitationally lensed Black Hole celestial scene
+- Added a layered palette-aware accretion disk, event horizon, lensing glow, and rotating gas detail
+- Added automatic portal suppression while the Black Hole scene is active
+- Added warm star color temperatures to the procedural night sky
+- Added slow travelling highlights to active navigation items
+- Added short spring-like focus arrival animations to form controls
+- Added a native confirmed **Reset to administrator defaults** action on Profile → Voidwave
+- Expanded preference validation, account sync, diagnostics, presets, and migration for the new options
+- Added automatic migration from v1.1 through v1.8 preferences
+- Bumped plugin and updater manifests to 1.9.0
+
 ## 1.8.0 — Celestial Profiles
 
 - Removed the floating Voidwave launcher shown in the lower-right corner

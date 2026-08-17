@@ -55,6 +55,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             'default_radius' => config('voidwave-theme.defaults.radius', 'soft'),
             'default_scene' => config('voidwave-theme.defaults.scene', 'eclipse'),
             'default_speed' => config('voidwave-theme.defaults.speed', 'normal'),
+            'default_glow' => config('voidwave-theme.defaults.glow', 'normal'),
         ];
     }
 
@@ -123,6 +124,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                     'none' => 'None',
                     'eclipse' => 'Void Eclipse',
                     'rings' => 'Ringed World',
+                    'blackhole' => 'Black Hole',
                 ])
                 ->required(),
             Select::make('default_speed')
@@ -131,6 +133,14 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                     'slow' => 'Slow',
                     'normal' => 'Normal',
                     'fast' => 'Fast',
+                ])
+                ->required(),
+            Select::make('default_glow')
+                ->label('Default glow intensity')
+                ->options([
+                    'subtle' => 'Subtle',
+                    'normal' => 'Normal',
+                    'intense' => 'Intense',
                 ])
                 ->required(),
         ];
@@ -155,6 +165,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             'VOIDWAVE_DEFAULT_RADIUS' => $data['default_radius'] ?? 'soft',
             'VOIDWAVE_DEFAULT_SCENE' => $data['default_scene'] ?? 'eclipse',
             'VOIDWAVE_DEFAULT_SPEED' => $data['default_speed'] ?? 'normal',
+            'VOIDWAVE_DEFAULT_GLOW' => $data['default_glow'] ?? 'normal',
         ]);
 
         Notification::make()
@@ -192,7 +203,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     var lastSparkle = 0;
     var hasLocalPreferences = false;
     var syncStatus = { authenticated: false, enabled: false, overrides: true, showControls: true, loaded: false, message: 'Loading preferences…' };
-    var storageKey = 'voidwave-preferences-v6';
+    var storageKey = 'voidwave-preferences-v7';
     var defaults = {
         effects: true,
         compact: false,
@@ -206,7 +217,8 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         sky: 'normal',
         radius: 'soft',
         scene: 'eclipse',
-        speed: 'normal'
+        speed: 'normal',
+        glow: 'normal'
     };
     var preferences = Object.assign({}, defaults);
 
@@ -225,16 +237,18 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             if (['glass', 'solid', 'crystal'].indexOf(saved.surface) !== -1) preferences.surface = saved.surface;
             if (['sparse', 'normal', 'galaxy'].indexOf(saved.sky) !== -1) preferences.sky = saved.sky;
             if (['sharp', 'soft', 'round'].indexOf(saved.radius) !== -1) preferences.radius = saved.radius;
-            if (['none', 'eclipse', 'rings'].indexOf(saved.scene) !== -1) preferences.scene = saved.scene;
+            if (['none', 'eclipse', 'rings', 'blackhole'].indexOf(saved.scene) !== -1) preferences.scene = saved.scene;
             if (['slow', 'normal', 'fast'].indexOf(saved.speed) !== -1) preferences.speed = saved.speed;
+            if (['subtle', 'normal', 'intense'].indexOf(saved.glow) !== -1) preferences.glow = saved.glow;
 
-            /* Migrate preferences from versions 1.1 through 1.7. */
+            /* Migrate preferences from versions 1.1 through 1.8. */
+            var legacyV6 = JSON.parse(localStorage.getItem('voidwave-preferences-v6') || '{}');
             var legacyV5 = JSON.parse(localStorage.getItem('voidwave-preferences-v5') || '{}');
             var legacyV4 = JSON.parse(localStorage.getItem('voidwave-preferences-v4') || '{}');
             var legacyV3 = JSON.parse(localStorage.getItem('voidwave-preferences-v3') || '{}');
             var legacyV2 = JSON.parse(localStorage.getItem('voidwave-preferences-v2') || '{}');
             var legacyV1 = JSON.parse(localStorage.getItem('voidwave-preferences-v1') || '{}');
-            var legacy = Object.assign({}, legacyV1, legacyV2, legacyV3, legacyV4, legacyV5);
+            var legacy = Object.assign({}, legacyV1, legacyV2, legacyV3, legacyV4, legacyV5, legacyV6);
             if (!hasLocalPreferences && Object.keys(legacy).length > 0) hasLocalPreferences = true;
             ['effects', 'compact', 'contrast', 'oled', 'cursor', 'floating'].forEach(function (key) {
                 if (typeof legacy[key] === 'boolean' && typeof saved[key] !== 'boolean') preferences[key] = legacy[key];
@@ -244,8 +258,9 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             if (['glass', 'solid', 'crystal'].indexOf(legacy.surface) !== -1 && !saved.surface) preferences.surface = legacy.surface;
             if (['sparse', 'normal', 'galaxy'].indexOf(legacy.sky) !== -1 && !saved.sky) preferences.sky = legacy.sky;
             if (['sharp', 'soft', 'round'].indexOf(legacy.radius) !== -1 && !saved.radius) preferences.radius = legacy.radius;
-            if (['none', 'eclipse', 'rings'].indexOf(legacy.scene) !== -1 && !saved.scene) preferences.scene = legacy.scene;
+            if (['none', 'eclipse', 'rings', 'blackhole'].indexOf(legacy.scene) !== -1 && !saved.scene) preferences.scene = legacy.scene;
             if (['slow', 'normal', 'fast'].indexOf(legacy.speed) !== -1 && !saved.speed) preferences.speed = legacy.speed;
+            if (['subtle', 'normal', 'intense'].indexOf(legacy.glow) !== -1 && !saved.glow) preferences.glow = legacy.glow;
             if (localStorage.getItem('voidwave-effects') === 'off' && typeof saved.effects !== 'boolean') preferences.effects = false;
         } catch (e) {}
         applyPreferences();
@@ -260,6 +275,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             localStorage.removeItem('voidwave-preferences-v3');
             localStorage.removeItem('voidwave-preferences-v4');
             localStorage.removeItem('voidwave-preferences-v5');
+            localStorage.removeItem('voidwave-preferences-v6');
             hasLocalPreferences = true;
         } catch (e) {}
         if (!skipSync) schedulePreferenceSync();
@@ -276,8 +292,9 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         if (['glass', 'solid', 'crystal'].indexOf(incoming.surface) !== -1) next.surface = incoming.surface;
         if (['sparse', 'normal', 'galaxy'].indexOf(incoming.sky) !== -1) next.sky = incoming.sky;
         if (['sharp', 'soft', 'round'].indexOf(incoming.radius) !== -1) next.radius = incoming.radius;
-        if (['none', 'eclipse', 'rings'].indexOf(incoming.scene) !== -1) next.scene = incoming.scene;
+        if (['none', 'eclipse', 'rings', 'blackhole'].indexOf(incoming.scene) !== -1) next.scene = incoming.scene;
         if (['slow', 'normal', 'fast'].indexOf(incoming.speed) !== -1) next.speed = incoming.speed;
+        if (['subtle', 'normal', 'intense'].indexOf(incoming.glow) !== -1) next.glow = incoming.glow;
         return next;
     }
 
@@ -408,6 +425,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         root.setAttribute('data-voidwave-radius', preferences.radius);
         root.setAttribute('data-voidwave-scene', preferences.scene);
         root.setAttribute('data-voidwave-speed', preferences.speed);
+        root.setAttribute('data-voidwave-glow', preferences.glow);
         if (window.VoidwaveSky && window.VoidwaveSky.configure) window.VoidwaveSky.configure(preferences);
         syncControls();
     }
@@ -558,9 +576,9 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                 showToast('Animation speed updated');
             } else if (presetButton) {
                 var preset = presetButton.getAttribute('data-voidwave-preset');
-                if (preset === 'performance') Object.assign(preferences, { effects: false, cursor: false, floating: false, ambience: 'calm', surface: 'solid', sky: 'sparse', radius: 'sharp', scene: 'none', speed: 'slow' });
-                if (preset === 'balanced') Object.assign(preferences, { effects: true, cursor: true, floating: true, ambience: 'balanced', surface: 'glass', sky: 'normal', radius: 'soft', scene: 'eclipse', speed: 'normal' });
-                if (preset === 'cinematic') Object.assign(preferences, { effects: true, cursor: true, floating: true, ambience: 'vivid', surface: 'crystal', sky: 'galaxy', radius: 'round', scene: 'rings', speed: 'fast' });
+                if (preset === 'performance') Object.assign(preferences, { effects: false, cursor: false, floating: false, ambience: 'calm', surface: 'solid', sky: 'sparse', radius: 'sharp', scene: 'none', speed: 'slow', glow: 'subtle' });
+                if (preset === 'balanced') Object.assign(preferences, { effects: true, cursor: true, floating: true, ambience: 'balanced', surface: 'glass', sky: 'normal', radius: 'soft', scene: 'eclipse', speed: 'normal', glow: 'normal' });
+                if (preset === 'cinematic') Object.assign(preferences, { effects: true, cursor: true, floating: true, ambience: 'vivid', surface: 'crystal', sky: 'galaxy', radius: 'round', scene: 'blackhole', speed: 'fast', glow: 'intense' });
                 savePreferences();
                 applyPreferences();
                 showToast(preset.charAt(0).toUpperCase() + preset.slice(1) + ' preset applied');
@@ -572,7 +590,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                 resetSyncedPreferences();
                 showToast('Using panel defaults');
             } else if (diagnosticsButton) {
-                var details = 'Voidwave Theme 1.8.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | scene=' + preferences.scene + ' | speed=' + preferences.speed + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
+                var details = 'Voidwave Theme 1.9.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | scene=' + preferences.scene + ' | speed=' + preferences.speed + ' | glow=' + preferences.glow + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(details).then(function () { showToast('Diagnostics copied'); });
                 } else {

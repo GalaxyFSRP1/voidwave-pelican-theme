@@ -18,5 +18,6 @@ return [
         'radius' => env('VOIDWAVE_DEFAULT_RADIUS', 'soft'),
         'scene' => env('VOIDWAVE_DEFAULT_SCENE', 'eclipse'),
         'speed' => env('VOIDWAVE_DEFAULT_SPEED', 'normal'),
+        'glow' => env('VOIDWAVE_DEFAULT_GLOW', 'normal'),
     ],
 ];
