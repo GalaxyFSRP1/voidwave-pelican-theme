@@ -23,11 +23,11 @@ class PreferencesController extends Controller
         }
 
         return response()->json([
-            'version' => '1.7.0',
+            'version' => '1.8.0',
             'authenticated' => $user !== null,
             'allow_user_overrides' => (bool) config('voidwave-theme.allow_user_overrides', true),
             'sync_preferences' => (bool) config('voidwave-theme.sync_preferences', true),
-            'show_controls' => (bool) config('voidwave-theme.show_controls', true),
+            'show_controls' => false,
             'defaults' => $this->defaults(),
             'preferences' => is_array($preferences) ? $preferences : null,
         ]);
@@ -50,6 +50,8 @@ class PreferencesController extends Controller
             'surface' => ['required', Rule::in(['glass', 'solid', 'crystal'])],
             'sky' => ['required', Rule::in(['sparse', 'normal', 'galaxy'])],
             'radius' => ['required', Rule::in(['sharp', 'soft', 'round'])],
+            'scene' => ['required', Rule::in(['none', 'eclipse', 'rings'])],
+            'speed' => ['required', Rule::in(['slow', 'normal', 'fast'])],
         ]);
 
         $user = $request->user();
@@ -103,6 +105,8 @@ class PreferencesController extends Controller
             'surface' => in_array($defaults['surface'] ?? null, ['glass', 'solid', 'crystal'], true) ? $defaults['surface'] : 'glass',
             'sky' => in_array($defaults['sky'] ?? null, ['sparse', 'normal', 'galaxy'], true) ? $defaults['sky'] : 'normal',
             'radius' => in_array($defaults['radius'] ?? null, ['sharp', 'soft', 'round'], true) ? $defaults['radius'] : 'soft',
+            'scene' => in_array($defaults['scene'] ?? null, ['none', 'eclipse', 'rings'], true) ? $defaults['scene'] : 'eclipse',
+            'speed' => in_array($defaults['speed'] ?? null, ['slow', 'normal', 'fast'], true) ? $defaults['speed'] : 'normal',
         ];
     }
 }

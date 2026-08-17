@@ -1946,3 +1946,211 @@ pre,
     .voidwave-tilting { transform: none !important; }
     #voidwave-sky-canvas { filter: none !important; }
 }
+
+/* Voidwave 1.8 — cleaner controls and cinematic celestial scenes */
+/* The old floating launcher is retired; customization now lives in Profile → Voidwave. */
+#voidwave-settings-toggle,
+#voidwave-preferences { display: none !important; }
+
+.voidwave-panel-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.voidwave-panel-actions > span {
+    color: var(--vw-cyan);
+    text-shadow: 0 0 12px var(--vw-cyan);
+}
+
+.voidwave-panel-actions button {
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    color: var(--vw-muted);
+    font-size: 18px !important;
+    background: rgb(255 255 255 / .035);
+    border: 1px solid var(--vw-border);
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.voidwave-scene-options,
+.voidwave-speed-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.voidwave-scene-options button,
+.voidwave-speed-options button {
+    padding: 7px 5px;
+    color: var(--vw-muted);
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    background: rgb(255 255 255 / .025);
+    border: 1px solid var(--vw-border);
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.voidwave-scene-options button:hover,
+.voidwave-scene-options button:focus-visible,
+.voidwave-scene-options button[aria-checked='true'],
+.voidwave-speed-options button:hover,
+.voidwave-speed-options button:focus-visible,
+.voidwave-speed-options button[aria-checked='true'] {
+    color: #fff;
+    background: color-mix(in srgb, var(--vw-purple) 11%, transparent);
+    border-color: var(--vw-border-bright);
+}
+
+/* Palette-aware aurora curtains create slow atmospheric depth. */
+.voidwave-aurora-curtain {
+    position: absolute;
+    inset: -35% -20% 20%;
+    opacity: .1;
+    transform: rotate(-8deg);
+    background:
+        repeating-linear-gradient(100deg,
+            transparent 0 8%,
+            color-mix(in srgb, var(--vw-cyan) 42%, transparent) 12%,
+            transparent 18% 27%,
+            color-mix(in srgb, var(--vw-purple) 38%, transparent) 32%,
+            transparent 40% 54%);
+    filter: blur(42px) saturate(170%);
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 78%);
+    mask-image: linear-gradient(to bottom, #000, transparent 78%);
+    animation: vw-aurora-curtain 19s ease-in-out infinite alternate;
+}
+
+/* Eclipse and ringed-world scenes use the same lightweight markup. */
+.voidwave-celestial {
+    position: absolute;
+    top: 11vh;
+    left: 8vw;
+    width: clamp(120px, 16vw, 245px);
+    aspect-ratio: 1;
+    opacity: .22;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: vw-celestial-float 18s ease-in-out infinite alternate;
+}
+
+:root[data-voidwave-scene='none'] .voidwave-celestial { display: none; }
+
+:root[data-voidwave-scene='eclipse'] .voidwave-celestial {
+    background:
+        radial-gradient(circle at 42% 38%, rgb(20 17 29), #020103 58%, #000 68%),
+        #000;
+    box-shadow:
+        0 0 2px 1px rgb(255 255 255 / .22),
+        0 0 22px color-mix(in srgb, var(--vw-cyan) 30%, transparent),
+        0 0 70px color-mix(in srgb, var(--vw-purple) 22%, transparent);
+}
+
+:root[data-voidwave-scene='eclipse'] .voidwave-celestial::before {
+    content: '';
+    position: absolute;
+    inset: -8%;
+    border-radius: 50%;
+    background: conic-gradient(from 120deg, transparent, color-mix(in srgb, var(--vw-cyan) 65%, white 10%), transparent 24%, transparent 78%, color-mix(in srgb, var(--vw-purple) 65%, white 8%), transparent);
+    filter: blur(8px);
+    -webkit-mask-image: radial-gradient(circle, transparent 59%, #000 63% 68%, transparent 73%);
+    mask-image: radial-gradient(circle, transparent 59%, #000 63% 68%, transparent 73%);
+    animation: vw-corona-turn 28s linear infinite;
+}
+
+:root[data-voidwave-scene='eclipse'] .voidwave-celestial > i {
+    position: absolute;
+    left: 27%;
+    top: 24%;
+    width: 9%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgb(255 255 255 / .035);
+    box-shadow: 38px 16px 0 4px rgb(255 255 255 / .018), 13px 51px 0 2px rgb(255 255 255 / .025);
+}
+
+:root[data-voidwave-scene='rings'] .voidwave-celestial {
+    background:
+        radial-gradient(circle at 34% 29%, rgb(255 255 255 / .22), transparent 15%),
+        linear-gradient(150deg, color-mix(in srgb, var(--vw-cyan) 58%, #152033), color-mix(in srgb, var(--vw-purple) 65%, #08050d) 58%, #030205);
+    box-shadow: inset -24px -20px 35px rgb(0 0 0 / .65), 0 0 45px color-mix(in srgb, var(--vw-purple) 22%, transparent);
+}
+
+:root[data-voidwave-scene='rings'] .voidwave-celestial > span {
+    position: absolute;
+    left: -38%;
+    right: -38%;
+    top: 43%;
+    height: 20%;
+    border: 4px solid color-mix(in srgb, var(--vw-cyan) 48%, white 8%);
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-radius: 50%;
+    transform: rotate(-13deg);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--vw-cyan) 18%, transparent);
+}
+
+:root[data-voidwave-scene='rings'] .voidwave-celestial > span::after {
+    content: '';
+    position: absolute;
+    inset: 5px -4px;
+    border: 1px solid color-mix(in srgb, var(--vw-pink) 38%, transparent);
+    border-radius: 50%;
+}
+
+/* User-selected timing affects CSS fallback and decorative layers too. */
+:root[data-voidwave-speed='slow'] {
+    --vw-nebula-duration: 25s; --vw-aurora-duration: 30s; --vw-celestial-duration: 28s;
+    --vw-orb-one-duration: 37s; --vw-orb-two-duration: 45s; --vw-orb-three-duration: 40s;
+}
+:root[data-voidwave-speed='normal'] {
+    --vw-nebula-duration: 16s; --vw-aurora-duration: 19s; --vw-celestial-duration: 18s;
+    --vw-orb-one-duration: 24s; --vw-orb-two-duration: 29s; --vw-orb-three-duration: 26s;
+}
+:root[data-voidwave-speed='fast'] {
+    --vw-nebula-duration: 11s; --vw-aurora-duration: 13s; --vw-celestial-duration: 12s;
+    --vw-orb-one-duration: 16s; --vw-orb-two-duration: 20s; --vw-orb-three-duration: 18s;
+}
+
+:root[data-voidwave-speed] .voidwave-nebula { animation-duration: var(--vw-nebula-duration); }
+:root[data-voidwave-speed] .voidwave-aurora-curtain { animation-duration: var(--vw-aurora-duration); }
+:root[data-voidwave-speed] .voidwave-celestial { animation-duration: var(--vw-celestial-duration); }
+:root[data-voidwave-speed] .voidwave-orb-one { animation-duration: var(--vw-orb-one-duration); }
+:root[data-voidwave-speed] .voidwave-orb-two { animation-duration: var(--vw-orb-two-duration); }
+:root[data-voidwave-speed] .voidwave-orb-three { animation-duration: var(--vw-orb-three-duration); }
+
+@keyframes vw-aurora-curtain {
+    from { transform: translate3d(-6%, -2%, 0) rotate(-9deg) scaleX(.94); opacity: .06; }
+    to { transform: translate3d(7%, 4%, 0) rotate(-5deg) scaleX(1.08); opacity: .16; }
+}
+
+@keyframes vw-celestial-float {
+    from { transform: translate3d(-8px, -6px, 0) rotate(-2deg); }
+    to { transform: translate3d(18px, 15px, 0) rotate(3deg); }
+}
+
+@keyframes vw-corona-turn { to { transform: rotate(360deg); } }
+
+.voidwave-static .voidwave-aurora-curtain,
+.voidwave-static .voidwave-celestial,
+.voidwave-static .voidwave-celestial::before,
+.voidwave-page-hidden .voidwave-aurora-curtain,
+.voidwave-page-hidden .voidwave-celestial,
+.voidwave-page-hidden .voidwave-celestial::before { animation-play-state: paused !important; }
+
+.voidwave-no-float .voidwave-celestial { display: none !important; }
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+    .voidwave-celestial { width: 110px; left: 4vw; top: 9vh; opacity: .13; }
+    .voidwave-aurora-curtain { opacity: .055; filter: blur(55px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .voidwave-aurora-curtain,
+    .voidwave-celestial,
+    .voidwave-celestial::before { animation: none !important; }
+}

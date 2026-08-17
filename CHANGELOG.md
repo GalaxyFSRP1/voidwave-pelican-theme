@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.8.0 — Celestial Profiles
+
+- Removed the floating Voidwave launcher shown in the lower-right corner
+- Made **Profile → Voidwave** the single native user-customization location
+- Kept administrator defaults under **Admin → Plugins → Voidwave Theme → Settings**
+- Added None, Void Eclipse, and Ringed World celestial scenes
+- Added a realistic palette-aware eclipse corona and rotating atmospheric glow
+- Added a shaded ringed planet with layered rings and depth lighting
+- Added slow palette-aware aurora curtains behind the interface
+- Added Slow, Normal, and Fast animation-speed profiles
+- Applied animation speed to the procedural canvas, nebulae, celestial body, aurora, and floating orbs
+- Improved the optional legacy drawer with a close button and cleaner responsive controls, while keeping it disabled
+- Added synchronized scene and speed preferences to the native profile section and administrator defaults
+- Expanded Balanced, Performance, and Cinematic presets with scene and speed choices
+- Added automatic migration from v1.1 through v1.7 preferences
+- Bumped plugin and updater manifests to 1.8.0
+
 ## 1.7.0 — Living Night Sky
 
 - Added a hardware-accelerated procedural canvas star field

@@ -3,7 +3,6 @@
 return [
     'allow_user_overrides' => filter_var(env('VOIDWAVE_ALLOW_USER_OVERRIDES', true), FILTER_VALIDATE_BOOL),
     'sync_preferences' => filter_var(env('VOIDWAVE_SYNC_PREFERENCES', true), FILTER_VALIDATE_BOOL),
-    'show_controls' => filter_var(env('VOIDWAVE_SHOW_CONTROLS', true), FILTER_VALIDATE_BOOL),
 
     'defaults' => [
         'effects' => filter_var(env('VOIDWAVE_DEFAULT_EFFECTS', true), FILTER_VALIDATE_BOOL),
@@ -17,5 +16,7 @@ return [
         'surface' => env('VOIDWAVE_DEFAULT_SURFACE', 'glass'),
         'sky' => env('VOIDWAVE_DEFAULT_SKY', 'normal'),
         'radius' => env('VOIDWAVE_DEFAULT_RADIUS', 'soft'),
+        'scene' => env('VOIDWAVE_DEFAULT_SCENE', 'eclipse'),
+        'speed' => env('VOIDWAVE_DEFAULT_SPEED', 'normal'),
     ],
 ];

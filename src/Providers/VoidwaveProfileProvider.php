@@ -126,6 +126,26 @@ class VoidwaveProfileProvider extends ServiceProvider
                 ->dehydrated(false)
                 ->live()
                 ->afterStateUpdated(fn (string $state) => $this->savePreference('radius', $state)),
+            Select::make('voidwave_scene')
+                ->label('Celestial scene')
+                ->options(['none' => 'None', 'eclipse' => 'Void Eclipse', 'rings' => 'Ringed World'])
+                ->selectablePlaceholder(false)
+                ->required()
+                ->default(fn (): string => (string) $this->preference('scene'))
+                ->disabled(fn (): bool => !$this->overridesAllowed())
+                ->dehydrated(false)
+                ->live()
+                ->afterStateUpdated(fn (string $state) => $this->savePreference('scene', $state)),
+            Select::make('voidwave_speed')
+                ->label('Animation speed')
+                ->options(['slow' => 'Slow', 'normal' => 'Normal', 'fast' => 'Fast'])
+                ->selectablePlaceholder(false)
+                ->required()
+                ->default(fn (): string => (string) $this->preference('speed'))
+                ->disabled(fn (): bool => !$this->overridesAllowed())
+                ->dehydrated(false)
+                ->live()
+                ->afterStateUpdated(fn (string $state) => $this->savePreference('speed', $state)),
         ];
     }
 
