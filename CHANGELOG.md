@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0 — Synced Across the Void
+
+- Added an official Pelican plugin settings page for administrator defaults
+- Added per-account preference synchronization across browsers and devices
+- Added administrator controls for user overrides, synchronization, and appearance-button visibility
+- Stored synchronized choices safely in Pelican's existing user customization data without a new database table
+- Added automatic local-to-account preference migration and offline/local fallback
+- Added visible sync states: loading, device-only, syncing, account-synced, panel defaults, and administrator-managed
+- Added a protected preference API with validation, authentication, CSRF protection, and rate limiting
+- Added Vivid-mode cursor stardust on precise-pointer devices
+- Added automatic migration from v1.1 through v1.4 preference formats
+- Bumped plugin and updater manifests to 1.5.0
+
 ## 1.4.0 — Reliable Releases
 
 - Added a much richer layered night sky with nebula clouds and parallax stardust

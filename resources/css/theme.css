@@ -1675,3 +1675,41 @@ pre,
     .fi-section-empty-state-icon-ctn,
     .fi-wi-stats-overview-stat { animation: none !important; }
 }
+
+/* Voidwave 1.5 synchronized-preference and interactive-sky polish */
+#voidwave-settings-toggle[hidden] { display: none !important; }
+#voidwave-sync-state {
+    transition: color 180ms ease;
+}
+
+.voidwave-cursor-sparkle {
+    position: fixed;
+    z-index: 79;
+    width: 3px;
+    height: 3px;
+    margin: -1px 0 0 -1px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: #fff;
+    box-shadow: 0 0 6px var(--vw-cyan), 0 0 12px color-mix(in srgb, var(--vw-purple) 70%, transparent);
+    animation: vw-cursor-sparkle 740ms cubic-bezier(.2,.7,.2,1) forwards;
+}
+
+.voidwave-cursor-sparkle::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(90deg, transparent 42%, rgb(255 255 255 / .7) 48% 52%, transparent 58%),
+                linear-gradient(transparent 42%, rgb(255 255 255 / .7) 48% 52%, transparent 58%);
+}
+
+@keyframes vw-cursor-sparkle {
+    0% { opacity: .9; transform: translate3d(0, 0, 0) scale(1); }
+    100% { opacity: 0; transform: translate3d(var(--vw-spark-x), var(--vw-spark-y), 0) scale(.2) rotate(80deg); }
+}
+
+.voidwave-static .voidwave-cursor-sparkle { display: none !important; }
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .voidwave-cursor-sparkle { display: none !important; }
+}
