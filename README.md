@@ -14,8 +14,10 @@ Voidwave wraps the entire panel in a deep-space purple/cyan look with drifting a
 - Animated shooting comets, stars, aurora orbs, and perspective grid
 - Interaction ripples on buttons, tabs, menus, and navigation
 - Top loading indicator for Livewire, Turbo, and normal panel navigation
-- Built-in **FX toggle** that remembers the user's choice in local storage
-- Enhanced badges, notifications, tooltips, pagination, skeleton loaders, and empty states
+- Built-in appearance center with persistent motion, compact-density, and contrast preferences
+- Three switchable palettes: **Voidwave**, **Aurora**, and **Ember**
+- Smart back-to-top control for long administration and server pages
+- Enhanced badges, notifications, tooltips, pagination, skeleton loaders, uploads, accordions, and empty states
 - No remote fonts, trackers, libraries, or image dependencies
 - Dark mode is forced so every component stays legible and consistent
 - Responsive design with reduced visual load on touch/mobile devices
@@ -37,16 +39,24 @@ The ZIP must contain `plugin.json` at its root. The release archive is already p
 
 Voidwave uses Pelican's current Filament plugin, render hook, and Vite theme APIs. It lists all three standard panels in `plugin.json`. Avoid enabling multiple theme plugins simultaneously because themes can compete for the same Filament theme slot.
 
-## Effects control
+## Appearance controls
 
-A small **FX** button appears in the lower-right corner. It pauses the ambient movement, comets, reactive spotlight, shimmer, and click ripples. The choice is stored only in the user's browser under `voidwave-effects`; no data is transmitted.
+A small **VOIDWAVE** button appears in the lower-right corner and opens the theme's appearance center. Each user can independently:
+
+- Enable or pause motion effects
+- Enable a compact information density
+- Enable stronger contrast
+- Choose Voidwave, Aurora, or Ember accents
+- Reset all appearance preferences
+
+A back-to-top control appears beside it on long pages. Preferences are stored only in the user's browser under `voidwave-preferences-v1`; no data is transmitted. Version 1.2 also migrates the older `voidwave-effects` preference automatically.
 
 ## Pelican Hub listing
 
 **Name:** Voidwave Theme  
 **Category:** Themes  
 **Author:** PhantomVoidTTV  
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **License:** MIT
 
 **Short description:**
@@ -55,14 +65,14 @@ A small **FX** button appears in the lower-right corner. It pauses the ambient m
 
 **Full description:**
 
-> Voidwave transforms Pelican Panel with a rich deep-space interface, animated aurora lighting, twinkling stars, shooting comets, a drifting perspective grid, pointer-reactive glow, glass surfaces, glowing navigation, interaction ripples, and a built-in effects toggle. It themes the admin, app, and server panels—including authentication, dashboards, forms, tables, dialogs, file views, and console chrome. No external assets or tracking are used, and motion automatically reduces when requested by the operating system.
+> Voidwave transforms Pelican Panel with a rich deep-space interface, animated aurora lighting, twinkling stars, shooting comets, a drifting perspective grid, pointer-reactive glow, glass surfaces, glowing navigation, and interaction ripples. Its built-in appearance center gives every user persistent motion, density, contrast, and palette controls. It themes the admin, app, and server panels—including authentication, dashboards, forms, tables, dialogs, uploads, file views, and console chrome. No external assets or tracking are used, and motion automatically reduces when requested by the operating system.
 
 Suggested tags: `theme`, `dark`, `animated`, `interactive`, `neon`, `purple`, `cyan`, `glass`
 
 ## Publishing checklist
 
 1. Push this source tree to `GalaxyFSRP1/voidwave-pelican-theme` on the `main` branch.
-2. Create a GitHub release tagged `v1.1.0`.
+2. Create a GitHub release tagged `v1.2.0`.
 3. Attach the provided archive as `voidwave-theme.zip`; this filename matches `update.json`.
 4. Capture clean screenshots of login, dashboard, server overview, and console pages on a test panel.
 5. Submit the plugin on Pelican Hub using the listing copy above.

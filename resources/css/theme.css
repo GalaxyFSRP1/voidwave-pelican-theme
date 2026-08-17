@@ -902,3 +902,295 @@ pre,
     #voidwave-progress.voidwave-progress-active span { width: 80%; animation: none !important; }
     .voidwave-ripple { display: none !important; }
 }
+
+/* Voidwave 1.2 appearance controls and practical UI refinements */
+:root[data-voidwave-palette='aurora'] {
+    --vw-purple: #0ea5e9;
+    --vw-violet: #2563eb;
+    --vw-cyan: #2dd4bf;
+    --vw-pink: #818cf8;
+    --vw-border-bright: rgb(45 212 191 / .42);
+}
+
+:root[data-voidwave-palette='ember'] {
+    --vw-purple: #f97316;
+    --vw-violet: #dc2626;
+    --vw-cyan: #fbbf24;
+    --vw-pink: #fb7185;
+    --vw-border-bright: rgb(251 146 60 / .46);
+}
+
+:root[data-voidwave-palette='aurora'] body,
+:root[data-voidwave-palette='ember'] body {
+    background:
+        radial-gradient(circle at 50% -20%, color-mix(in srgb, var(--vw-violet) 18%, transparent), transparent 42rem),
+        linear-gradient(145deg, var(--vw-void), var(--vw-deep) 48%, #0a0712) !important;
+}
+
+:root[data-voidwave-palette='aurora'] .voidwave-grid,
+:root[data-voidwave-palette='ember'] .voidwave-grid {
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--vw-purple) 28%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--vw-cyan) 20%, transparent) 1px, transparent 1px);
+}
+
+#voidwave-controls {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    z-index: 80;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+#voidwave-controls button { font: inherit; }
+#voidwave-preferences[hidden] { display: none !important; }
+
+#voidwave-settings-toggle,
+#voidwave-back-to-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    color: var(--vw-muted);
+    background: rgb(10 7 17 / .86);
+    border: 1px solid var(--vw-border);
+    box-shadow: 0 10px 35px rgb(0 0 0 / .38), inset 0 1px 0 rgb(255 255 255 / .04);
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+    cursor: pointer;
+    transition: opacity 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+#voidwave-settings-toggle {
+    gap: 7px;
+    padding: 8px 11px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .09em;
+    opacity: .68;
+}
+
+#voidwave-settings-toggle > span:first-child {
+    color: var(--vw-cyan);
+    text-shadow: 0 0 9px var(--vw-cyan);
+}
+
+#voidwave-settings-toggle:hover,
+#voidwave-settings-toggle:focus-visible,
+#voidwave-settings-toggle[aria-expanded='true'],
+#voidwave-back-to-top:hover,
+#voidwave-back-to-top:focus-visible {
+    color: #fff;
+    opacity: 1;
+    border-color: var(--vw-border-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 38px rgb(0 0 0 / .42), 0 0 20px color-mix(in srgb, var(--vw-purple) 16%, transparent);
+}
+
+#voidwave-back-to-top {
+    width: 34px;
+    border-radius: 50%;
+    font-size: 17px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+}
+
+#voidwave-back-to-top.voidwave-visible {
+    opacity: .75;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#voidwave-preferences {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    width: min(330px, calc(100vw - 30px));
+    overflow: hidden;
+    color: var(--vw-text);
+    background: rgb(14 10 24 / .96);
+    border: 1px solid var(--vw-border-bright);
+    border-radius: 15px;
+    box-shadow: 0 28px 80px rgb(0 0 0 / .62), 0 0 42px color-mix(in srgb, var(--vw-purple) 11%, transparent), inset 0 1px 0 rgb(255 255 255 / .05);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    transform-origin: bottom right;
+    animation: vw-preferences-in 210ms cubic-bezier(.16,1,.3,1);
+}
+
+#voidwave-preferences header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 17px 13px;
+    border-bottom: 1px solid var(--vw-border);
+    background: linear-gradient(110deg, color-mix(in srgb, var(--vw-purple) 12%, transparent), transparent 68%);
+}
+
+#voidwave-preferences header > div { display: grid; gap: 2px; }
+#voidwave-preferences header strong { font-size: 14px; letter-spacing: -.01em; }
+#voidwave-preferences header small,
+#voidwave-preferences button small { color: var(--vw-muted); font-size: 10px; font-weight: 500; }
+#voidwave-preferences header > span { color: var(--vw-cyan); font-size: 17px; text-shadow: 0 0 12px var(--vw-cyan); }
+
+.voidwave-option-list { padding: 7px; }
+
+.voidwave-option-list > button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+    color: var(--vw-text);
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.voidwave-option-list > button:hover,
+.voidwave-option-list > button:focus-visible {
+    background: color-mix(in srgb, var(--vw-purple) 9%, transparent);
+    border-color: var(--vw-border);
+}
+
+.voidwave-option-list > button > span { display: grid; gap: 2px; }
+.voidwave-option-list b { font-size: 12px; }
+.voidwave-option-state {
+    min-width: 37px;
+    padding: 4px 6px;
+    color: var(--vw-dim);
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    background: rgb(255 255 255 / .035);
+    border: 1px solid var(--vw-border);
+    border-radius: 999px;
+}
+
+.voidwave-option-list > button[aria-pressed='true'] .voidwave-option-state {
+    color: #fff;
+    background: color-mix(in srgb, var(--vw-purple) 72%, var(--vw-deep));
+    border-color: color-mix(in srgb, var(--vw-purple) 70%, #fff 10%);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--vw-purple) 25%, transparent);
+}
+
+#voidwave-preferences fieldset {
+    margin: 0;
+    padding: 12px 16px 14px;
+    border: 0;
+    border-top: 1px solid var(--vw-border);
+}
+
+#voidwave-preferences legend {
+    padding-top: 12px;
+    color: var(--vw-muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.voidwave-palettes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.voidwave-palettes button {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 8px 4px;
+    color: var(--vw-muted);
+    font-size: 9px;
+    background: rgb(255 255 255 / .025);
+    border: 1px solid var(--vw-border);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.voidwave-palettes button:hover,
+.voidwave-palettes button:focus-visible,
+.voidwave-palettes button[aria-checked='true'] { color: #fff; border-color: var(--vw-border-bright); background: rgb(255 255 255 / .055); }
+.voidwave-palettes button[aria-checked='true'] { box-shadow: 0 0 0 2px color-mix(in srgb, var(--vw-purple) 13%, transparent); }
+.voidwave-palettes i { width: 34px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #7c3aed, #a855f7, #22d3ee); }
+.voidwave-palettes [data-voidwave-palette='aurora'] i { background: linear-gradient(90deg, #2563eb, #0ea5e9, #2dd4bf); }
+.voidwave-palettes [data-voidwave-palette='ember'] i { background: linear-gradient(90deg, #dc2626, #f97316, #fbbf24); }
+
+.voidwave-reset {
+    width: 100%;
+    padding: 10px;
+    color: var(--vw-muted);
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    background: rgb(255 255 255 / .018);
+    border: 0;
+    border-top: 1px solid var(--vw-border);
+    cursor: pointer;
+}
+.voidwave-reset:hover,
+.voidwave-reset:focus-visible { color: var(--vw-cyan); background: color-mix(in srgb, var(--vw-cyan) 6%, transparent); }
+
+/* Compact mode changes density without hiding information. */
+.voidwave-compact .fi-section-content { padding: 1rem !important; }
+.voidwave-compact .fi-section-header { padding: .8rem 1rem !important; }
+.voidwave-compact .fi-ta-cell { padding-top: .5rem !important; padding-bottom: .5rem !important; }
+.voidwave-compact .fi-wi-stats-overview-stat { padding: 1rem !important; }
+.voidwave-compact .fi-header { gap: .8rem !important; }
+.voidwave-compact .fi-fo-field-wrp { gap: .35rem !important; }
+.voidwave-compact .fi-sidebar-item-btn,
+.voidwave-compact .fi-sidebar-item-button { padding-top: .42rem !important; padding-bottom: .42rem !important; }
+
+/* Manual contrast preference can be used independently of the OS setting. */
+.voidwave-high-contrast {
+    --vw-border: rgb(216 180 254 / .42);
+    --vw-border-bright: color-mix(in srgb, var(--vw-purple) 68%, #fff 15%);
+    --vw-muted: #d2cde4;
+    --vw-dim: #aaa4c0;
+    --vw-panel: rgb(18 13 30 / .94);
+}
+.voidwave-high-contrast .voidwave-ambient { opacity: .42; }
+.voidwave-high-contrast .fi-section:not(.fi-section-not-contained),
+.voidwave-high-contrast .fi-ta-ctn,
+.voidwave-high-contrast .fi-wi-stats-overview-stat { background: rgb(15 10 25 / .94) !important; }
+
+/* Additional component polish for common real panel workflows. */
+.fi-page { animation: vw-page-in 340ms cubic-bezier(.2,.8,.2,1); }
+.fi-fo-file-upload,
+.filepond--root { transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease; }
+.fi-fo-file-upload:hover,
+.filepond--root:hover {
+    border-color: var(--vw-border-bright) !important;
+    box-shadow: inset 0 0 30px color-mix(in srgb, var(--vw-purple) 5%, transparent) !important;
+}
+.fi-ac-accordion-item { border-color: var(--vw-border) !important; }
+.fi-ac-accordion-item-header { transition: background-color 160ms ease; }
+.fi-ac-accordion-item-header:hover { background: color-mix(in srgb, var(--vw-purple) 6%, transparent) !important; }
+.fi-ta-record-checkbox:checked { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--vw-purple) 55%, transparent)); }
+
+@keyframes vw-preferences-in {
+    from { opacity: 0; transform: translateY(8px) scale(.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes vw-page-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    #voidwave-controls { right: 10px; bottom: 10px; }
+    #voidwave-settings-toggle > span:last-child { display: none; }
+    #voidwave-settings-toggle { width: 35px; padding: 8px; }
+    #voidwave-preferences { width: min(320px, calc(100vw - 20px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-page,
+    #voidwave-preferences { animation: none !important; }
+}

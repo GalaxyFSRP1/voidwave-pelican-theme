@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.0 — Personalize the Void
+
+- Replaced the basic FX switch with an accessible appearance center
+- Added persistent compact-density and high-contrast modes
+- Added Voidwave, Aurora, and Ember accent palettes
+- Added one-click reset and automatic migration of v1.1 preferences
+- Added a smart back-to-top control for long pages
+- Added subtle page-entry transitions for Livewire-rendered pages
+- Improved uploads, accordions, record selection, and mobile controls
+- Added keyboard dismissal, click-outside handling, focus management, and ARIA state synchronization
+- Kept all preferences private in browser local storage with no external requests
+- Bumped plugin and updater manifests to 1.2.0
+
 ## 1.1.0 — Enhanced Void
 
 - Added pointer-reactive ambient spotlight on precise-pointer devices
