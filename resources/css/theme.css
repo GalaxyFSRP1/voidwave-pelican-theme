@@ -672,3 +672,233 @@ pre,
 
     .voidwave-ambient { opacity: .45; }
 }
+
+/* Voidwave 1.1 enhanced interaction layer */
+#voidwave-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 10000;
+    height: 3px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 180ms ease;
+}
+
+#voidwave-progress span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--vw-violet), var(--vw-purple), var(--vw-cyan), var(--vw-pink));
+    background-size: 200% 100%;
+    box-shadow: 0 0 14px var(--vw-cyan), 0 0 25px rgb(168 85 247 / .55);
+}
+
+#voidwave-progress.voidwave-progress-active { opacity: 1; }
+#voidwave-progress.voidwave-progress-active span { animation: vw-progress 8s cubic-bezier(.1,.7,.15,1) forwards, vw-border-flow 1.5s linear infinite; }
+#voidwave-progress.voidwave-progress-done span { width: 100%; animation: none; transition: width 180ms ease; }
+#voidwave-progress.voidwave-progress-done { opacity: 0; transition-delay: 180ms; }
+
+.voidwave-spotlight {
+    position: absolute;
+    inset: 0;
+    opacity: .32;
+    background: radial-gradient(500px circle at var(--vw-pointer-x, 50vw) var(--vw-pointer-y, 35vh), rgb(34 211 238 / .11), rgb(168 85 247 / .045) 34%, transparent 68%);
+    transition: opacity 300ms ease;
+}
+
+.voidwave-comets {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.voidwave-comets i {
+    position: absolute;
+    top: -12vh;
+    right: -15vw;
+    width: 150px;
+    height: 1px;
+    opacity: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgb(103 232 249 / .85));
+    filter: drop-shadow(0 0 5px rgb(34 211 238 / .8));
+    transform: rotate(-35deg);
+    animation: vw-comet 13s linear infinite;
+}
+
+.voidwave-comets i::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 8px 2px var(--vw-cyan);
+}
+
+.voidwave-comets i:nth-child(2) { top: 18vh; animation-delay: -5s; animation-duration: 17s; transform: rotate(-42deg) scale(.72); }
+.voidwave-comets i:nth-child(3) { top: 47vh; animation-delay: -10s; animation-duration: 21s; transform: rotate(-31deg) scale(.48); }
+
+#voidwave-fx-toggle {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    z-index: 39;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 6px 9px;
+    color: var(--vw-muted);
+    font: 700 10px/1 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: .08em;
+    background: rgb(10 7 17 / .72);
+    border: 1px solid var(--vw-border);
+    border-radius: 999px;
+    box-shadow: 0 8px 30px rgb(0 0 0 / .25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+    opacity: .58;
+    transition: opacity 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+#voidwave-fx-toggle:hover,
+#voidwave-fx-toggle:focus-visible {
+    color: #fff;
+    border-color: var(--vw-border-bright);
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+#voidwave-fx-toggle[aria-pressed='true'] { color: var(--vw-dim); }
+.voidwave-fx-icon { color: var(--vw-cyan); text-shadow: 0 0 8px var(--vw-cyan); }
+
+.fi-btn,
+.fi-icon-btn,
+.fi-sidebar-item-btn,
+.fi-sidebar-item-button,
+.fi-tabs-item,
+.fi-dropdown-list-item {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.voidwave-ripple {
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgb(255 255 255 / .28), rgb(34 211 238 / .15) 35%, transparent 70%);
+    transform: scale(0);
+    animation: vw-ripple 620ms cubic-bezier(.2,.7,.3,1) forwards;
+}
+
+.fi-notification {
+    animation: vw-notification-in 380ms cubic-bezier(.16,1,.3,1);
+}
+
+.fi-badge {
+    border: 1px solid rgb(255 255 255 / .08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .04);
+}
+
+.fi-badge.fi-color-success,
+.fi-badge-color-success {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 0 13px rgb(52 211 153 / .1);
+}
+
+.fi-tooltip {
+    color: var(--vw-text) !important;
+    background: rgb(10 7 17 / .96) !important;
+    border: 1px solid var(--vw-border-bright) !important;
+    box-shadow: 0 10px 30px rgb(0 0 0 / .45) !important;
+    backdrop-filter: blur(12px);
+}
+
+.fi-breadcrumbs-item-label { color: var(--vw-muted) !important; transition: color 150ms ease; }
+.fi-breadcrumbs-item-label:hover { color: var(--vw-cyan) !important; }
+.fi-pagination-item-active > * {
+    color: #fff !important;
+    background: linear-gradient(135deg, var(--vw-violet), var(--vw-purple)) !important;
+    box-shadow: 0 7px 18px rgb(124 58 237 / .26);
+}
+
+.fi-skeleton,
+[class*='skeleton'] {
+    background: linear-gradient(100deg, rgb(40 31 60 / .7) 20%, rgb(168 85 247 / .14) 40%, rgb(40 31 60 / .7) 60%) !important;
+    background-size: 220% 100% !important;
+    animation: vw-skeleton 1.8s ease-in-out infinite !important;
+}
+
+.fi-ta-empty-state-icon-ctn,
+.fi-section-empty-state-icon-ctn {
+    color: var(--vw-cyan) !important;
+    background: linear-gradient(145deg, rgb(168 85 247 / .16), rgb(34 211 238 / .08)) !important;
+    border: 1px solid var(--vw-border);
+    box-shadow: 0 0 30px rgb(34 211 238 / .08);
+}
+
+@keyframes vw-progress {
+    0% { width: 0; }
+    12% { width: 30%; }
+    45% { width: 68%; }
+    80% { width: 88%; }
+    100% { width: 94%; }
+}
+
+@keyframes vw-comet {
+    0%, 72% { opacity: 0; transform: translate3d(0, 0, 0) rotate(-35deg); }
+    74% { opacity: 1; }
+    88% { opacity: .75; }
+    100% { opacity: 0; transform: translate3d(-125vw, 95vh, 0) rotate(-35deg); }
+}
+
+@keyframes vw-ripple {
+    0% { opacity: .8; transform: scale(0); }
+    100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes vw-notification-in {
+    from { opacity: 0; transform: translateX(24px) scale(.96); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes vw-skeleton {
+    from { background-position: 200% 0; }
+    to { background-position: -20% 0; }
+}
+
+/* User-controlled effects pause. Content interactions remain intact. */
+.voidwave-static .voidwave-grid,
+.voidwave-static .voidwave-orb,
+.voidwave-static .voidwave-stars,
+.voidwave-static .voidwave-comets i,
+.voidwave-static .fi-header-heading,
+.voidwave-static .fi-simple-main::before,
+.voidwave-static .fi-skeleton,
+.voidwave-static [class*='skeleton'] {
+    animation: none !important;
+}
+
+.voidwave-static .voidwave-spotlight,
+.voidwave-static .voidwave-comets { opacity: 0 !important; }
+.voidwave-static .voidwave-ripple { display: none !important; }
+
+@media (hover: none), (pointer: coarse) {
+    .voidwave-spotlight { display: none; }
+    .voidwave-comets i:nth-child(n+2) { display: none; }
+    #voidwave-fx-toggle { padding: 7px; }
+    #voidwave-fx-toggle .voidwave-fx-label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .voidwave-spotlight,
+    .voidwave-comets { display: none !important; }
+    #voidwave-progress.voidwave-progress-active span { width: 80%; animation: none !important; }
+    .voidwave-ripple { display: none !important; }
+}
