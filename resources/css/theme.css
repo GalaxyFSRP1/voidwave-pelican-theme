@@ -1852,3 +1852,97 @@ pre,
     .voidwave-option-list > button { padding-block: 7px; }
     #voidwave-preferences fieldset { padding-block: 9px; }
 }
+
+/* Voidwave 1.7 — procedural realistic sky and cinematic depth */
+#voidwave-sky-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .82;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transition: opacity 500ms ease, filter 500ms ease;
+}
+
+/* Canvas replaces repetitive CSS stars while CSS remains a no-JS fallback. */
+.voidwave-canvas-ready .voidwave-stars,
+.voidwave-canvas-ready .voidwave-dust,
+.voidwave-canvas-ready .voidwave-comets {
+    opacity: 0 !important;
+    animation-play-state: paused !important;
+}
+
+:root[data-voidwave-sky='sparse'] #voidwave-sky-canvas { opacity: .48; }
+:root[data-voidwave-sky='normal'] #voidwave-sky-canvas { opacity: .78; }
+:root[data-voidwave-sky='galaxy'] #voidwave-sky-canvas {
+    opacity: 1;
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--vw-cyan) 28%, transparent));
+}
+
+.voidwave-static #voidwave-sky-canvas,
+.voidwave-data-saver #voidwave-sky-canvas { opacity: .38; filter: none; }
+
+/* Subtle physical tilt is limited to Vivid mode and precise pointers. */
+.voidwave-tilting {
+    transform: perspective(1100px) rotateX(var(--vw-tilt-x, 0deg)) rotateY(var(--vw-tilt-y, 0deg)) translateY(-2px) !important;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 90ms linear, border-color 220ms ease, box-shadow 220ms ease !important;
+}
+
+.voidwave-tilting::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(500px circle at var(--vw-pointer-x, 50%) var(--vw-pointer-y, 50%), rgb(255 255 255 / .035), transparent 45%);
+}
+
+/* Realistic status breathing and surface light sweeps. */
+.fi-badge.fi-color-success::before,
+.fi-badge-color-success::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    margin-inline-end: 5px;
+    border-radius: 50%;
+    background: var(--vw-green);
+    box-shadow: 0 0 8px var(--vw-green);
+    animation: vw-status-breathe 2.2s ease-in-out infinite;
+}
+
+:root[data-voidwave-ambience='vivid'] .fi-wi-stats-overview-stat::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 20%, rgb(255 255 255 / .035) 42%, transparent 62%);
+    background-size: 240% 100%;
+    animation: vw-surface-sweep 9s ease-in-out infinite;
+}
+
+@keyframes vw-status-breathe {
+    0%, 100% { opacity: .55; transform: scale(.82); }
+    50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes vw-surface-sweep {
+    0%, 62% { background-position: 180% 0; opacity: 0; }
+    72% { opacity: 1; }
+    100% { background-position: -80% 0; opacity: 0; }
+}
+
+.voidwave-static .fi-badge.fi-color-success::before,
+.voidwave-static .fi-badge-color-success::before,
+.voidwave-static .fi-wi-stats-overview-stat::before { animation: none !important; }
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .voidwave-tilting { transform: none !important; }
+    #voidwave-sky-canvas { filter: none !important; }
+}

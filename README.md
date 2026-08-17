@@ -11,8 +11,10 @@ Voidwave wraps the entire panel in a deep-space purple/cyan look with drifting a
 - Applies to all standard Pelican panels: `admin`, `app`, and `server`
 - Covers login/simple pages, dashboards, server pages, console, tables, forms, dialogs, dropdowns, notifications, and navigation
 - Pointer-reactive ambient spotlight on desktop
-- Layered night-sky background with twinkling stars, parallax stardust, colored nebula clouds, and a perspective grid
-- Seven staggered shooting-star paths with varied speeds and sizes
+- Procedural canvas night sky with depth-aware stars, natural twinkling, cross-shaped bright stars, pointer parallax, and adaptive frame rates
+- Physically animated shooting stars with randomized origins, speed, lifetime, color, brightness, and fading trails
+- Galaxy-mode constellation lines generated from the procedural star field
+- Layered CSS fallback sky with twinkling stars, parallax stardust, colored nebula clouds, and a perspective grid
 - Distant animated void portal with orbiting energy rings
 - Floating crystalline void shards and optional floating dashboard widgets in Vivid mode
 - Interaction ripples on buttons, tabs, menus, and navigation
@@ -26,6 +28,10 @@ Voidwave wraps the entire panel in a deep-space purple/cyan look with drifting a
 - Sharp, Soft, and Round corner profiles
 - Separate cursor-stardust and floating-accent controls
 - Automatic reduced-data performance mode when the browser requests data saving
+- Adaptive 20/30/50 FPS sky rendering for Calm, Balanced, and Vivid modes
+- Cinematic pointer-based 3D card tilt on precise-pointer devices
+- Realistic server-status breathing lights and slow surface-light sweeps
+- Dedicated **Voidwave** section on the Pelican profile customization page
 - Four switchable palettes: **Voidwave**, **Aurora**, **Ember**, and **Nebula**
 - Calm, balanced, and vivid ambience intensity levels
 - Glass, Solid, and Crystal surface profiles
@@ -75,11 +81,13 @@ A small **VOIDWAVE** button appears in the lower-right corner and opens the them
 - Copy a safe theme diagnostic string for support
 - Reset all appearance preferences
 
-Press `Alt + V` to open the appearance center. A back-to-top control appears beside it on long pages. Signed-in users can synchronize preferences through their Pelican account, while local storage keeps the theme responsive and supports login pages. Version 1.6 automatically migrates preferences from versions 1.1 through 1.5.
+Press `Alt + V` to open the appearance center. A back-to-top control appears beside it on long pages. Signed-in users can synchronize preferences through their Pelican account, while local storage keeps the theme responsive and supports login pages. Version 1.7 automatically migrates preferences from versions 1.1 through 1.6.
 
-## Administrator defaults and account sync
+## Administrator defaults and user customization
 
-Open **Admin → Plugins → Voidwave Theme → Settings** to configure panel-wide defaults. Administrators can choose the default state of every appearance option, allow or lock user overrides, enable or disable account synchronization, and show or hide the appearance control.
+Open **Admin → Plugins → Voidwave Theme → Settings** to configure panel-wide defaults. Administrators can choose the default state of every appearance option, allow or lock user overrides, enable or disable account synchronization, and show or hide the floating appearance control.
+
+Users can configure the same synchronized options under **Profile → Voidwave**. The dedicated profile section uses native Filament controls and saves each change directly to the signed-in Pelican account. The floating appearance center remains available for fast live changes on any page.
 
 When synchronization is enabled, authenticated preferences are stored inside Pelican's existing user `customization` data under the isolated `voidwave` key. No new database table or external service is required. Login and logged-out pages use the administrator defaults with a local browser fallback.
 
@@ -88,7 +96,7 @@ When synchronization is enabled, authenticated preferences are stored inside Pel
 **Name:** Voidwave Theme  
 **Category:** Themes  
 **Author:** PhantomVoidTTV  
-**Version:** 1.6.0  
+**Version:** 1.7.0  
 **License:** MIT
 
 **Short description:**
@@ -104,7 +112,7 @@ Suggested tags: `theme`, `dark`, `animated`, `interactive`, `neon`, `purple`, `c
 ## Publishing checklist
 
 1. Push this source tree to `GalaxyFSRP1/voidwave-pelican-theme` on the `main` branch.
-2. Push the tag `v1.6.0` (lowercase `v`).
+2. Push the tag `v1.7.0` (lowercase `v`).
 3. Let `.github/workflows/release.yml` create the release and attach `voidwave-theme.zip` automatically.
 4. Capture clean screenshots of login, dashboard, server overview, and console pages on a test panel.
 5. Submit the plugin on Pelican Hub using the listing copy above.

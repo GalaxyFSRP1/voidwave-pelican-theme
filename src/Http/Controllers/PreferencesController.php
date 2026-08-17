@@ -23,7 +23,7 @@ class PreferencesController extends Controller
         }
 
         return response()->json([
-            'version' => '1.6.0',
+            'version' => '1.7.0',
             'authenticated' => $user !== null,
             'allow_user_overrides' => (bool) config('voidwave-theme.allow_user_overrides', true),
             'sync_preferences' => (bool) config('voidwave-theme.sync_preferences', true),

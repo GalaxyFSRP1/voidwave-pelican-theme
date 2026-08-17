@@ -381,6 +381,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         root.setAttribute('data-voidwave-surface', preferences.surface);
         root.setAttribute('data-voidwave-sky', preferences.sky);
         root.setAttribute('data-voidwave-radius', preferences.radius);
+        if (window.VoidwaveSky && window.VoidwaveSky.configure) window.VoidwaveSky.configure(preferences);
         syncControls();
     }
 
@@ -518,7 +519,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                 resetSyncedPreferences();
                 showToast('Using panel defaults');
             } else if (diagnosticsButton) {
-                var details = 'Voidwave Theme 1.6.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
+                var details = 'Voidwave Theme 1.7.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(details).then(function () { showToast('Diagnostics copied'); });
                 } else {
@@ -556,6 +557,185 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         syncControls();
     }
 
+    function initSkyEngine() {
+        if (window.VoidwaveSky && window.VoidwaveSky.ready) return;
+        var canvas = document.getElementById('voidwave-sky-canvas');
+        if (!canvas || !canvas.getContext) return;
+
+        var context = canvas.getContext('2d', { alpha: true });
+        if (!context) return;
+
+        var width = 0;
+        var height = 0;
+        var ratio = 1;
+        var stars = [];
+        var meteors = [];
+        var skyPreferences = Object.assign({}, preferences);
+        var pointer = { x: 0, y: 0 };
+        var frame = 0;
+        var previousTime = 0;
+        var accumulated = 0;
+        var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        function palette() {
+            var styles = getComputedStyle(root);
+            return {
+                primary: styles.getPropertyValue('--vw-purple').trim() || '#a855f7',
+                cyan: styles.getPropertyValue('--vw-cyan').trim() || '#22d3ee',
+                pink: styles.getPropertyValue('--vw-pink').trim() || '#f472b6'
+            };
+        }
+
+        function resize() {
+            width = Math.max(1, window.innerWidth);
+            height = Math.max(1, window.innerHeight);
+            ratio = Math.min(window.devicePixelRatio || 1, 1.75);
+            canvas.width = Math.floor(width * ratio);
+            canvas.height = Math.floor(height * ratio);
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            context.setTransform(ratio, 0, 0, ratio, 0, 0);
+            rebuild();
+        }
+
+        function rebuild() {
+            var count = skyPreferences.sky === 'sparse' ? 55 : (skyPreferences.sky === 'galaxy' ? 190 : 105);
+            if (width < 700) count = Math.round(count * .58);
+            stars = Array.from({ length: count }, function (_, index) {
+                return {
+                    x: Math.random(),
+                    y: Math.random(),
+                    depth: .25 + Math.random() * .75,
+                    size: .45 + Math.random() * 1.65,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: .35 + Math.random() * 1.25,
+                    color: index % 17 === 0 ? 'cyan' : (index % 29 === 0 ? 'pink' : 'white')
+                };
+            });
+            draw(performance.now(), true);
+        }
+
+        function spawnMeteor() {
+            var colors = palette();
+            meteors.push({
+                x: width * (.45 + Math.random() * .7),
+                y: -30 + Math.random() * height * .42,
+                vx: -(520 + Math.random() * 520),
+                vy: 230 + Math.random() * 330,
+                life: 0,
+                maxLife: .8 + Math.random() * .75,
+                width: .8 + Math.random() * 1.4,
+                color: Math.random() > .72 ? colors.cyan : '#ffffff'
+            });
+        }
+
+        function draw(time, force) {
+            var fps = skyPreferences.ambience === 'vivid' ? 50 : (skyPreferences.ambience === 'calm' ? 20 : 30);
+            var interval = 1000 / fps;
+            var elapsed = previousTime ? Math.min(80, time - previousTime) : interval;
+            previousTime = time;
+            accumulated += elapsed;
+
+            var animated = skyPreferences.effects && !reducedMotion.matches && !document.hidden && !root.classList.contains('voidwave-data-saver');
+            if (!force && animated && accumulated < interval) {
+                frame = requestAnimationFrame(draw);
+                return;
+            }
+
+            var dt = Math.max(.001, accumulated / 1000);
+            accumulated = 0;
+            context.clearRect(0, 0, width, height);
+            var colors = palette();
+            var parallaxX = pointer.x * 13;
+            var parallaxY = pointer.y * 9;
+
+            if (skyPreferences.sky === 'galaxy' && stars.length >= 8) {
+                context.beginPath();
+                context.strokeStyle = colors.cyan + '18';
+                context.lineWidth = .6;
+                for (var c = 0; c < 7; c++) {
+                    var first = stars[c];
+                    var second = stars[c + 1];
+                    context.moveTo(first.x * width, first.y * height);
+                    context.lineTo(second.x * width, second.y * height);
+                }
+                context.stroke();
+            }
+
+            stars.forEach(function (star) {
+                var twinkle = animated ? .58 + Math.sin(time * .001 * star.speed + star.phase) * .3 : .72;
+                var x = star.x * width + parallaxX * star.depth;
+                var y = star.y * height + parallaxY * star.depth;
+                var radius = star.size * (.55 + star.depth * .6);
+                context.globalAlpha = Math.max(.12, twinkle) * (.45 + star.depth * .5);
+                context.fillStyle = star.color === 'cyan' ? colors.cyan : (star.color === 'pink' ? colors.pink : '#ffffff');
+                context.beginPath();
+                context.arc(x, y, radius, 0, Math.PI * 2);
+                context.fill();
+                if (radius > 1.35) {
+                    context.globalAlpha *= .22;
+                    context.fillRect(x - radius * 3, y - .35, radius * 6, .7);
+                    context.fillRect(x - .35, y - radius * 3, .7, radius * 6);
+                }
+            });
+            context.globalAlpha = 1;
+
+            if (animated) {
+                var chance = skyPreferences.sky === 'galaxy' ? .012 : (skyPreferences.sky === 'sparse' ? .002 : .005);
+                if (Math.random() < chance * dt * 60 && meteors.length < 3) spawnMeteor();
+            }
+
+            meteors = meteors.filter(function (meteor) {
+                meteor.life += dt;
+                meteor.x += meteor.vx * dt;
+                meteor.y += meteor.vy * dt;
+                var alpha = Math.sin(Math.min(1, meteor.life / meteor.maxLife) * Math.PI);
+                var tailX = meteor.x - meteor.vx * .15;
+                var tailY = meteor.y - meteor.vy * .15;
+                var gradient = context.createLinearGradient(meteor.x, meteor.y, tailX, tailY);
+                gradient.addColorStop(0, meteor.color);
+                gradient.addColorStop(1, 'transparent');
+                context.globalAlpha = alpha;
+                context.strokeStyle = gradient;
+                context.lineWidth = meteor.width;
+                context.beginPath();
+                context.moveTo(meteor.x, meteor.y);
+                context.lineTo(tailX, tailY);
+                context.stroke();
+                context.globalAlpha = 1;
+                return meteor.life < meteor.maxLife && meteor.x > -250 && meteor.y < height + 150;
+            });
+
+            if (animated) frame = requestAnimationFrame(draw);
+        }
+
+        function configure(next) {
+            var oldSky = skyPreferences.sky;
+            skyPreferences = Object.assign({}, next);
+            if (oldSky !== skyPreferences.sky || !stars.length) rebuild();
+            cancelAnimationFrame(frame);
+            previousTime = 0;
+            accumulated = 0;
+            draw(performance.now(), true);
+        }
+
+        window.VoidwaveSky = {
+            ready: true,
+            configure: configure,
+            pointer: function (event) {
+                pointer.x = event.clientX / Math.max(1, width) - .5;
+                pointer.y = event.clientY / Math.max(1, height) - .5;
+            },
+            wake: function () { configure(skyPreferences); }
+        };
+
+        root.classList.add('voidwave-canvas-ready');
+        window.addEventListener('resize', resize, { passive: true });
+        reducedMotion.addEventListener('change', function () { configure(skyPreferences); });
+        resize();
+        configure(preferences);
+    }
+
     function startProgress() {
         var bar = document.getElementById('voidwave-progress');
         if (!bar) return;
@@ -581,6 +761,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
 
     function syncPageVisibility() {
         root.classList.toggle('voidwave-page-hidden', document.hidden);
+        if (!document.hidden && window.VoidwaveSky && window.VoidwaveSky.wake) window.VoidwaveSky.wake();
     }
     document.addEventListener('visibilitychange', syncPageVisibility);
     syncPageVisibility();
@@ -589,7 +770,20 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     if (connection && connection.saveData) root.classList.add('voidwave-data-saver');
 
     document.addEventListener('pointermove', function (event) {
+        if (window.VoidwaveSky && window.VoidwaveSky.pointer) window.VoidwaveSky.pointer(event);
         if (!preferences.effects) return;
+
+        if (preferences.floating && preferences.ambience === 'vivid' && window.matchMedia('(pointer: fine)').matches) {
+            var tiltCard = event.target.closest('.fi-wi-stats-overview-stat, .fi-section:not(.fi-section-not-contained)');
+            if (tiltCard) {
+                var tiltRect = tiltCard.getBoundingClientRect();
+                var rotateY = ((event.clientX - tiltRect.left) / Math.max(1, tiltRect.width) - .5) * 2.4;
+                var rotateX = -((event.clientY - tiltRect.top) / Math.max(1, tiltRect.height) - .5) * 2.1;
+                tiltCard.style.setProperty('--vw-tilt-x', rotateX.toFixed(2) + 'deg');
+                tiltCard.style.setProperty('--vw-tilt-y', rotateY.toFixed(2) + 'deg');
+                tiltCard.classList.add('voidwave-tilting');
+            }
+        }
 
         var now = Date.now();
         if (preferences.cursor && preferences.ambience === 'vivid' && now - lastSparkle > 85 && window.matchMedia('(pointer: fine)').matches) {
@@ -612,6 +806,15 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         });
     }, { passive: true });
 
+    document.addEventListener('pointerout', function (event) {
+        var card = event.target.closest && event.target.closest('.voidwave-tilting');
+        if (card && (!event.relatedTarget || !card.contains(event.relatedTarget))) {
+            card.classList.remove('voidwave-tilting');
+            card.style.removeProperty('--vw-tilt-x');
+            card.style.removeProperty('--vw-tilt-y');
+        }
+    }, { passive: true });
+
     document.addEventListener('click', function (event) {
         var target = event.target.closest('.fi-btn, .fi-icon-btn, .fi-sidebar-item-btn, .fi-sidebar-item-button, .fi-tabs-item, .fi-dropdown-list-item');
         if (!target || !preferences.effects) return;
@@ -628,12 +831,29 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         setTimeout(function () { ripple.remove(); }, 650);
     });
 
+    document.addEventListener('livewire:init', function () {
+        if (!window.Livewire || window.__voidwaveProfileHook) return;
+        window.__voidwaveProfileHook = true;
+        window.Livewire.hook('commit', function (payload) {
+            payload.succeed(function () {
+                if (/profile/i.test(window.location.pathname)) setTimeout(loadSyncedPreferences, 80);
+            });
+        });
+    });
     document.addEventListener('livewire:navigating', startProgress);
     document.addEventListener('livewire:navigated', finishProgress);
     document.addEventListener('turbo:before-visit', startProgress);
     document.addEventListener('turbo:load', finishProgress);
     window.addEventListener('pageshow', finishProgress);
-    window.addEventListener('DOMContentLoaded', setupControls);
+    function bootVoidwaveUi() {
+        setupControls();
+        initSkyEngine();
+    }
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', bootVoidwaveUi);
+    } else {
+        bootVoidwaveUi();
+    }
 
     document.addEventListener('click', function (event) {
         var link = event.target.closest('a[href]');
@@ -650,6 +870,7 @@ HTML);
         $panel->renderHook('panels::body.start', fn (): string => <<<'HTML'
 <div id="voidwave-progress" aria-hidden="true"><span></span></div>
 <div class="voidwave-ambient" aria-hidden="true">
+    <canvas id="voidwave-sky-canvas"></canvas>
     <div class="voidwave-grid"></div>
     <div class="voidwave-nebula"></div>
     <div class="voidwave-portal"><i></i><i></i><i></i></div>

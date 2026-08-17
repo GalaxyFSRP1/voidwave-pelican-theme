@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.7.0 — Living Night Sky
+
+- Added a hardware-accelerated procedural canvas star field
+- Added depth-aware twinkling, bright-star flares, pointer parallax, and palette-aware star colors
+- Added randomized shooting stars with natural velocity, lifetime, glow, and fading trails
+- Added subtle generated constellation lines in Galaxy sky mode
+- Added adaptive 20, 30, and 50 FPS rendering based on ambient intensity
+- Added static rendering for reduced motion, data-saving mode, disabled effects, and background tabs
+- Preserved the layered CSS sky as a graceful no-canvas fallback
+- Added cinematic pointer-based card tilt in Vivid mode
+- Added realistic status-light breathing and slow dashboard surface sweeps
+- Added a native **Voidwave** section to the Pelican profile page
+- Added native profile controls for every synchronized user preference
+- Added automatic live refresh after profile preference changes
+- Kept administrator defaults on the official plugin settings page
+- Bumped plugin and updater manifests to 1.7.0
+
 ## 1.6.0 — Void Command Center
 
 - Added one-click Performance, Balanced, and Cinematic appearance presets
