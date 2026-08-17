@@ -147,7 +147,7 @@ class VoidwaveProfileProvider extends ServiceProvider
                 ->afterStateUpdated(fn (string $state) => $this->savePreference('radius', $state)),
             Select::make('voidwave_scene')
                 ->label('Celestial scene')
-                ->options(['none' => 'None', 'eclipse' => 'Void Eclipse', 'rings' => 'Ringed World', 'blackhole' => 'Black Hole'])
+                ->options(['none' => 'None', 'eclipse' => 'Void Eclipse', 'rings' => 'Ringed World', 'blackhole' => 'Black Hole', 'supernova' => 'Supernova'])
                 ->selectablePlaceholder(false)
                 ->required()
                 ->default(fn (): string => (string) $this->preference('scene'))
@@ -175,6 +175,16 @@ class VoidwaveProfileProvider extends ServiceProvider
                 ->dehydrated(false)
                 ->live()
                 ->afterStateUpdated(fn (string $state) => $this->savePreference('glow', $state)),
+            Select::make('voidwave_weather')
+                ->label('Cosmic weather')
+                ->options(['clear' => 'Clear Void', 'aurora' => 'Aurora Storm', 'meteor' => 'Meteor Storm'])
+                ->selectablePlaceholder(false)
+                ->required()
+                ->default(fn (): string => (string) $this->preference('weather'))
+                ->disabled(fn (): bool => !$this->overridesAllowed())
+                ->dehydrated(false)
+                ->live()
+                ->afterStateUpdated(fn (string $state) => $this->savePreference('weather', $state)),
         ];
     }
 

@@ -19,5 +19,6 @@ return [
         'scene' => env('VOIDWAVE_DEFAULT_SCENE', 'eclipse'),
         'speed' => env('VOIDWAVE_DEFAULT_SPEED', 'normal'),
         'glow' => env('VOIDWAVE_DEFAULT_GLOW', 'normal'),
+        'weather' => env('VOIDWAVE_DEFAULT_WEATHER', 'clear'),
     ],
 ];

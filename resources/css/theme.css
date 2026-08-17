@@ -2278,3 +2278,117 @@ pre,
     .fi-input-wrp:focus-within,
     .fi-select:focus-within { animation: none !important; }
 }
+
+/* Voidwave 1.10 — cosmic weather, supernova scene, and navigation warp */
+:root[data-voidwave-weather='aurora'] .voidwave-aurora-curtain {
+    opacity: .25;
+    filter: blur(29px) saturate(220%);
+    mix-blend-mode: screen;
+}
+:root[data-voidwave-weather='aurora'] .voidwave-nebula { opacity: .5; filter: blur(18px) saturate(195%); }
+:root[data-voidwave-weather='aurora'] .voidwave-orb { mix-blend-mode: color-dodge; }
+
+:root[data-voidwave-weather='meteor'] #voidwave-sky-canvas {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--vw-cyan) 36%, transparent));
+}
+:root[data-voidwave-weather='meteor'] .voidwave-aurora-curtain { opacity: .035; }
+
+/* Expanding supernova shell with hot core, gas rings, and diffraction rays. */
+:root[data-voidwave-scene='supernova'] .voidwave-celestial {
+    left: 9vw;
+    right: auto;
+    background:
+        radial-gradient(circle, #fff 0 3%, #fff4ce 4%, color-mix(in srgb, var(--vw-cyan) 72%, white 15%) 8%, color-mix(in srgb, var(--vw-purple) 72%, transparent) 21%, transparent 52%);
+    box-shadow:
+        0 0 25px #fff,
+        0 0 65px color-mix(in srgb, var(--vw-cyan) 50%, transparent),
+        0 0 135px color-mix(in srgb, var(--vw-purple) 38%, transparent);
+    animation: vw-supernova-drift 15s ease-in-out infinite alternate;
+}
+
+:root[data-voidwave-scene='supernova'] .voidwave-celestial::before {
+    content: '';
+    position: absolute;
+    inset: 2%;
+    border: 2px solid color-mix(in srgb, var(--vw-cyan) 55%, transparent);
+    border-radius: 50%;
+    box-shadow:
+        0 0 15px color-mix(in srgb, var(--vw-cyan) 45%, transparent),
+        inset 0 0 25px color-mix(in srgb, var(--vw-pink) 25%, transparent);
+    animation: vw-supernova-shell 4.8s ease-out infinite;
+}
+
+:root[data-voidwave-scene='supernova'] .voidwave-celestial::after {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background:
+        linear-gradient(90deg, transparent 49.6%, rgb(255 255 255 / .38) 50%, transparent 50.4%),
+        linear-gradient(transparent 49.6%, rgb(255 255 255 / .32) 50%, transparent 50.4%),
+        linear-gradient(45deg, transparent 49.75%, color-mix(in srgb, var(--vw-cyan) 34%, transparent) 50%, transparent 50.25%),
+        linear-gradient(-45deg, transparent 49.75%, color-mix(in srgb, var(--vw-purple) 34%, transparent) 50%, transparent 50.25%);
+    border-radius: 50%;
+    animation: vw-corona-turn 36s linear infinite;
+}
+
+:root[data-voidwave-scene='supernova'] .voidwave-celestial > i {
+    position: absolute;
+    inset: 26%;
+    border-radius: 50%;
+    background: #fff;
+    filter: blur(3px);
+    animation: vw-star-heart 1.8s ease-in-out infinite alternate;
+}
+
+/* Brief hyperspace streak on panel navigation. */
+.voidwave-warping #voidwave-sky-canvas {
+    filter: blur(.4px) brightness(1.5) drop-shadow(0 0 6px var(--vw-cyan));
+    transform: scale(1.025);
+    transition: transform 250ms ease, filter 180ms ease;
+}
+.voidwave-warping .voidwave-grid { opacity: .25; transform: perspective(700px) rotateX(62deg) translateY(21%) scale(1.04); }
+.voidwave-warping .voidwave-nebula { opacity: .58; }
+
+.voidwave-click-burst {
+    position: fixed;
+    z-index: 10002;
+    width: 3px;
+    height: 3px;
+    margin: -1px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: #fff;
+    box-shadow: 0 0 7px var(--vw-cyan), 0 0 12px var(--vw-purple);
+    animation: vw-click-burst 580ms cubic-bezier(.15,.72,.24,1) forwards;
+}
+
+@keyframes vw-supernova-shell {
+    0% { opacity: .75; transform: scale(.45); }
+    75%, 100% { opacity: 0; transform: scale(1.45); }
+}
+@keyframes vw-supernova-drift {
+    from { transform: translate3d(-6px,-8px,0) scale(.94); }
+    to { transform: translate3d(17px,13px,0) scale(1.05); }
+}
+@keyframes vw-star-heart {
+    from { opacity: .72; transform: scale(.88); box-shadow: 0 0 14px 5px #fff; }
+    to { opacity: 1; transform: scale(1.12); box-shadow: 0 0 25px 10px #fff, 0 0 44px var(--vw-cyan); }
+}
+@keyframes vw-click-burst {
+    from { opacity: 1; transform: rotate(var(--vw-burst-angle)) translateX(0) scale(1); }
+    to { opacity: 0; transform: rotate(var(--vw-burst-angle)) translateX(var(--vw-burst-distance)) scale(.2); }
+}
+
+.voidwave-static .voidwave-click-burst,
+.voidwave-static .voidwave-celestial::before,
+.voidwave-static .voidwave-celestial::after,
+.voidwave-static .voidwave-celestial > i { animation: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    .voidwave-click-burst { display: none !important; }
+    .voidwave-warping #voidwave-sky-canvas { transform: none; filter: none; }
+    :root[data-voidwave-scene='supernova'] .voidwave-celestial,
+    :root[data-voidwave-scene='supernova'] .voidwave-celestial::before,
+    :root[data-voidwave-scene='supernova'] .voidwave-celestial::after,
+    :root[data-voidwave-scene='supernova'] .voidwave-celestial > i { animation: none !important; }
+}

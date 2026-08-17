@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.10.0 — Cosmic Persistence
+
+- Fixed preferences not visually restoring after browser Back and Forward navigation
+- Added forced no-cache account-preference requests and private `no-store` API responses
+- Added preference refresh on bfcache restore, `popstate`, Livewire navigation, and Turbo navigation
+- Added Clear Void, Aurora Storm, and Meteor Storm synchronized cosmic-weather profiles
+- Meteor Storm increases procedural meteor frequency while Aurora Storm boosts volumetric color
+- Added an animated Supernova scene with a hot stellar core, expanding gas shell, diffraction rays, and palette-aware bloom
+- Added a brief hyperspace treatment during panel navigation
+- Added six-particle click starbursts in Vivid mode
+- Added administrator and native profile controls for cosmic weather and Supernova
+- Expanded diagnostics, validation, migration, account sync, and presets for all new options
+- Added automatic migration from v1.1 through v1.9 preferences
+- Bumped plugin and updater manifests to 1.10.0
+
 ## 1.9.0 — Event Horizon
 
 - Added a synchronized Subtle, Normal, and Intense glow profile

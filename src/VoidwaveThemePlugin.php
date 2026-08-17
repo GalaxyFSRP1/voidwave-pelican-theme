@@ -56,6 +56,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             'default_scene' => config('voidwave-theme.defaults.scene', 'eclipse'),
             'default_speed' => config('voidwave-theme.defaults.speed', 'normal'),
             'default_glow' => config('voidwave-theme.defaults.glow', 'normal'),
+            'default_weather' => config('voidwave-theme.defaults.weather', 'clear'),
         ];
     }
 
@@ -125,6 +126,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                     'eclipse' => 'Void Eclipse',
                     'rings' => 'Ringed World',
                     'blackhole' => 'Black Hole',
+                    'supernova' => 'Supernova',
                 ])
                 ->required(),
             Select::make('default_speed')
@@ -141,6 +143,14 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                     'subtle' => 'Subtle',
                     'normal' => 'Normal',
                     'intense' => 'Intense',
+                ])
+                ->required(),
+            Select::make('default_weather')
+                ->label('Default cosmic weather')
+                ->options([
+                    'clear' => 'Clear Void',
+                    'aurora' => 'Aurora Storm',
+                    'meteor' => 'Meteor Storm',
                 ])
                 ->required(),
         ];
@@ -166,6 +176,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             'VOIDWAVE_DEFAULT_SCENE' => $data['default_scene'] ?? 'eclipse',
             'VOIDWAVE_DEFAULT_SPEED' => $data['default_speed'] ?? 'normal',
             'VOIDWAVE_DEFAULT_GLOW' => $data['default_glow'] ?? 'normal',
+            'VOIDWAVE_DEFAULT_WEATHER' => $data['default_weather'] ?? 'clear',
         ]);
 
         Notification::make()
@@ -203,7 +214,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     var lastSparkle = 0;
     var hasLocalPreferences = false;
     var syncStatus = { authenticated: false, enabled: false, overrides: true, showControls: true, loaded: false, message: 'Loading preferences…' };
-    var storageKey = 'voidwave-preferences-v7';
+    var storageKey = 'voidwave-preferences-v8';
     var defaults = {
         effects: true,
         compact: false,
@@ -218,7 +229,8 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         radius: 'soft',
         scene: 'eclipse',
         speed: 'normal',
-        glow: 'normal'
+        glow: 'normal',
+        weather: 'clear'
     };
     var preferences = Object.assign({}, defaults);
 
@@ -237,18 +249,20 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             if (['glass', 'solid', 'crystal'].indexOf(saved.surface) !== -1) preferences.surface = saved.surface;
             if (['sparse', 'normal', 'galaxy'].indexOf(saved.sky) !== -1) preferences.sky = saved.sky;
             if (['sharp', 'soft', 'round'].indexOf(saved.radius) !== -1) preferences.radius = saved.radius;
-            if (['none', 'eclipse', 'rings', 'blackhole'].indexOf(saved.scene) !== -1) preferences.scene = saved.scene;
+            if (['none', 'eclipse', 'rings', 'blackhole', 'supernova'].indexOf(saved.scene) !== -1) preferences.scene = saved.scene;
             if (['slow', 'normal', 'fast'].indexOf(saved.speed) !== -1) preferences.speed = saved.speed;
             if (['subtle', 'normal', 'intense'].indexOf(saved.glow) !== -1) preferences.glow = saved.glow;
+            if (['clear', 'aurora', 'meteor'].indexOf(saved.weather) !== -1) preferences.weather = saved.weather;
 
-            /* Migrate preferences from versions 1.1 through 1.8. */
+            /* Migrate preferences from versions 1.1 through 1.9. */
+            var legacyV7 = JSON.parse(localStorage.getItem('voidwave-preferences-v7') || '{}');
             var legacyV6 = JSON.parse(localStorage.getItem('voidwave-preferences-v6') || '{}');
             var legacyV5 = JSON.parse(localStorage.getItem('voidwave-preferences-v5') || '{}');
             var legacyV4 = JSON.parse(localStorage.getItem('voidwave-preferences-v4') || '{}');
             var legacyV3 = JSON.parse(localStorage.getItem('voidwave-preferences-v3') || '{}');
             var legacyV2 = JSON.parse(localStorage.getItem('voidwave-preferences-v2') || '{}');
             var legacyV1 = JSON.parse(localStorage.getItem('voidwave-preferences-v1') || '{}');
-            var legacy = Object.assign({}, legacyV1, legacyV2, legacyV3, legacyV4, legacyV5, legacyV6);
+            var legacy = Object.assign({}, legacyV1, legacyV2, legacyV3, legacyV4, legacyV5, legacyV6, legacyV7);
             if (!hasLocalPreferences && Object.keys(legacy).length > 0) hasLocalPreferences = true;
             ['effects', 'compact', 'contrast', 'oled', 'cursor', 'floating'].forEach(function (key) {
                 if (typeof legacy[key] === 'boolean' && typeof saved[key] !== 'boolean') preferences[key] = legacy[key];
@@ -258,9 +272,10 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             if (['glass', 'solid', 'crystal'].indexOf(legacy.surface) !== -1 && !saved.surface) preferences.surface = legacy.surface;
             if (['sparse', 'normal', 'galaxy'].indexOf(legacy.sky) !== -1 && !saved.sky) preferences.sky = legacy.sky;
             if (['sharp', 'soft', 'round'].indexOf(legacy.radius) !== -1 && !saved.radius) preferences.radius = legacy.radius;
-            if (['none', 'eclipse', 'rings', 'blackhole'].indexOf(legacy.scene) !== -1 && !saved.scene) preferences.scene = legacy.scene;
+            if (['none', 'eclipse', 'rings', 'blackhole', 'supernova'].indexOf(legacy.scene) !== -1 && !saved.scene) preferences.scene = legacy.scene;
             if (['slow', 'normal', 'fast'].indexOf(legacy.speed) !== -1 && !saved.speed) preferences.speed = legacy.speed;
             if (['subtle', 'normal', 'intense'].indexOf(legacy.glow) !== -1 && !saved.glow) preferences.glow = legacy.glow;
+            if (['clear', 'aurora', 'meteor'].indexOf(legacy.weather) !== -1 && !saved.weather) preferences.weather = legacy.weather;
             if (localStorage.getItem('voidwave-effects') === 'off' && typeof saved.effects !== 'boolean') preferences.effects = false;
         } catch (e) {}
         applyPreferences();
@@ -276,6 +291,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             localStorage.removeItem('voidwave-preferences-v4');
             localStorage.removeItem('voidwave-preferences-v5');
             localStorage.removeItem('voidwave-preferences-v6');
+            localStorage.removeItem('voidwave-preferences-v7');
             hasLocalPreferences = true;
         } catch (e) {}
         if (!skipSync) schedulePreferenceSync();
@@ -292,9 +308,10 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         if (['glass', 'solid', 'crystal'].indexOf(incoming.surface) !== -1) next.surface = incoming.surface;
         if (['sparse', 'normal', 'galaxy'].indexOf(incoming.sky) !== -1) next.sky = incoming.sky;
         if (['sharp', 'soft', 'round'].indexOf(incoming.radius) !== -1) next.radius = incoming.radius;
-        if (['none', 'eclipse', 'rings', 'blackhole'].indexOf(incoming.scene) !== -1) next.scene = incoming.scene;
+        if (['none', 'eclipse', 'rings', 'blackhole', 'supernova'].indexOf(incoming.scene) !== -1) next.scene = incoming.scene;
         if (['slow', 'normal', 'fast'].indexOf(incoming.speed) !== -1) next.speed = incoming.speed;
         if (['subtle', 'normal', 'intense'].indexOf(incoming.glow) !== -1) next.glow = incoming.glow;
+        if (['clear', 'aurora', 'meteor'].indexOf(incoming.weather) !== -1) next.weather = incoming.weather;
         return next;
     }
 
@@ -360,7 +377,8 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
     function loadSyncedPreferences() {
         fetch('/voidwave/preferences', {
             credentials: 'same-origin',
-            headers: { 'Accept': 'application/json' }
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' }
         }).then(function (response) {
             if (!response.ok) throw new Error('Preferences unavailable');
             return response.json();
@@ -426,6 +444,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         root.setAttribute('data-voidwave-scene', preferences.scene);
         root.setAttribute('data-voidwave-speed', preferences.speed);
         root.setAttribute('data-voidwave-glow', preferences.glow);
+        root.setAttribute('data-voidwave-weather', preferences.weather);
         if (window.VoidwaveSky && window.VoidwaveSky.configure) window.VoidwaveSky.configure(preferences);
         syncControls();
     }
@@ -590,7 +609,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
                 resetSyncedPreferences();
                 showToast('Using panel defaults');
             } else if (diagnosticsButton) {
-                var details = 'Voidwave Theme 1.9.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | scene=' + preferences.scene + ' | speed=' + preferences.speed + ' | glow=' + preferences.glow + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
+                var details = 'Voidwave Theme 1.10.0 | palette=' + preferences.palette + ' | ambience=' + preferences.ambience + ' | surface=' + preferences.surface + ' | sky=' + preferences.sky + ' | radius=' + preferences.radius + ' | scene=' + preferences.scene + ' | speed=' + preferences.speed + ' | glow=' + preferences.glow + ' | weather=' + preferences.weather + ' | effects=' + preferences.effects + ' | cursor=' + preferences.cursor + ' | floating=' + preferences.floating + ' | compact=' + preferences.compact + ' | contrast=' + preferences.contrast + ' | oled=' + preferences.oled + ' | accountSync=' + syncStatus.enabled;
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(details).then(function () { showToast('Diagnostics copied'); });
                 } else {
@@ -757,6 +776,8 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
 
             if (animated) {
                 var chance = skyPreferences.sky === 'galaxy' ? .012 : (skyPreferences.sky === 'sparse' ? .002 : .005);
+                if (skyPreferences.weather === 'meteor') chance *= 5.5;
+                if (skyPreferences.weather === 'aurora') chance *= .55;
                 if (Math.random() < chance * dt * 60 * motionScale && meteors.length < 3) spawnMeteor();
             }
 
@@ -815,6 +836,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         var bar = document.getElementById('voidwave-progress');
         if (!bar) return;
         clearTimeout(progressTimer);
+        root.classList.add('voidwave-warping');
         bar.classList.remove('voidwave-progress-done');
         bar.classList.add('voidwave-progress-active');
         progressTimer = setTimeout(finishProgress, 8000);
@@ -824,6 +846,7 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         var bar = document.getElementById('voidwave-progress');
         if (!bar) return;
         clearTimeout(progressTimer);
+        root.classList.remove('voidwave-warping');
         bar.classList.add('voidwave-progress-done');
         setTimeout(function () {
             bar.classList.remove('voidwave-progress-active', 'voidwave-progress-done');
@@ -904,6 +927,19 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
         ripple.style.top = (event.clientY - rect.top - size / 2) + 'px';
         target.appendChild(ripple);
         setTimeout(function () { ripple.remove(); }, 650);
+
+        if (preferences.cursor && preferences.ambience === 'vivid') {
+            for (var burstIndex = 0; burstIndex < 6; burstIndex++) {
+                var burst = document.createElement('i');
+                burst.className = 'voidwave-click-burst';
+                burst.style.left = event.clientX + 'px';
+                burst.style.top = event.clientY + 'px';
+                burst.style.setProperty('--vw-burst-angle', (burstIndex * 60 + Math.random() * 18) + 'deg');
+                burst.style.setProperty('--vw-burst-distance', (18 + Math.random() * 22) + 'px');
+                document.body.appendChild(burst);
+                setTimeout(function (particle) { particle.remove(); }, 620, burst);
+            }
+        }
     });
 
     document.addEventListener('livewire:init', function () {
@@ -915,11 +951,31 @@ class VoidwaveThemePlugin implements HasPluginSettings, Plugin
             });
         });
     });
+    var preferenceRefreshTimer;
+    function refreshPreferencesAfterNavigation() {
+        clearTimeout(preferenceRefreshTimer);
+        preferenceRefreshTimer = setTimeout(function () {
+            loadPreferences();
+            loadSyncedPreferences();
+            if (window.VoidwaveSky && window.VoidwaveSky.wake) window.VoidwaveSky.wake();
+        }, 80);
+    }
+
     document.addEventListener('livewire:navigating', startProgress);
-    document.addEventListener('livewire:navigated', finishProgress);
+    document.addEventListener('livewire:navigated', function () {
+        finishProgress();
+        refreshPreferencesAfterNavigation();
+    });
     document.addEventListener('turbo:before-visit', startProgress);
-    document.addEventListener('turbo:load', finishProgress);
-    window.addEventListener('pageshow', finishProgress);
+    document.addEventListener('turbo:load', function () {
+        finishProgress();
+        refreshPreferencesAfterNavigation();
+    });
+    window.addEventListener('pageshow', function () {
+        finishProgress();
+        refreshPreferencesAfterNavigation();
+    });
+    window.addEventListener('popstate', refreshPreferencesAfterNavigation);
     function bootVoidwaveUi() {
         setupControls();
         initSkyEngine();
